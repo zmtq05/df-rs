@@ -1,15 +1,14 @@
-mod api;
-mod error;
-
+pub mod api;
+pub mod error;
+pub use error::Error;
 pub mod model;
 
 use std::sync::OnceLock;
 
 use api::{auction::AuctionArtifacts, image::ImageHandler};
-use error::Error;
 use reqwest::Response;
 
-type Result<T, E = error::Error> = std::result::Result<T, E>;
+type Result<T, E = Error> = std::result::Result<T, E>;
 
 const DF_BASE_URL: &str = "https://api.neople.co.kr/df";
 
