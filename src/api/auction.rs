@@ -1,5 +1,6 @@
 use convert_case::{Case, Casing};
 use serde::{Deserialize, Serialize};
+use urlencoding::encode;
 
 use crate::{
     model::{AuctionInfo, ItemRarity, SoldAuctionInfo},
@@ -11,16 +12,22 @@ use crate::{
 pub struct AuctionArtifacts<'df> {
     #[serde(skip)]
     client: &'df DfClient,
-    limit: Option<u16>,
-    #[serde(serialize_with = "Sort::serialize")]
-    sort: Sort,
-    #[serde(skip_serializing_if = "String::is_empty")]
+
+    // NOTE:
+    // `serde_urlencoded` serialize space to plus sign.
+    // neople open api doesn't support plus sign.
+    // so we need to add it manually by `urlencoding::encode`.
+    #[serde(skip)]
     item_id: String,
-    #[serde(skip_serializing_if = "String::is_empty")]
+    #[serde(skip)]
     item_name: String,
+
+    limit: Option<u16>,
+    #[serde(serialize_with = "Sort::nested_qs")]
+    sort: Sort,
     word_type: Option<WordType>,
     word_short: Option<bool>,
-    #[serde(rename = "q", serialize_with = "Query::serialize")]
+    #[serde(rename = "q", serialize_with = "Query::nested_qs")]
     query: Query,
 }
 
@@ -32,7 +39,7 @@ pub struct Sort {
 }
 
 impl Sort {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn nested_qs<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -85,7 +92,7 @@ pub struct Query {
 }
 
 impl Query {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    fn nested_qs<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
     {
@@ -248,15 +255,9 @@ impl<'df> AuctionArtifacts<'df> {
 
 impl<'df> AuctionArtifacts<'df> {
     pub async fn search(&self) -> crate::Result<Vec<AuctionInfo>> {
-        assert!(!self.item_id.is_empty() || !self.item_name.is_empty());
+        let url = self.make_url("/auction");
 
-        let response = self
-            .client
-            .inner
-            .get(format!("{DF_BASE_URL}/auction"))
-            .query(self)
-            .send()
-            .await?;
+        let response = self.client.inner.get(url).query(self).send().await?;
 
         let response = crate::map_api_error(response).await?;
 
@@ -271,12 +272,12 @@ impl<'df> AuctionArtifacts<'df> {
     }
 
     pub async fn sold(&self) -> crate::Result<Vec<SoldAuctionInfo>> {
-        assert!(!self.item_id.is_empty() || !self.item_name.is_empty());
+        let url = self.make_url("/auction-sold");
 
         let response = self
             .client
             .inner
-            .get(format!("{DF_BASE_URL}/auction-sold"))
+            .get(url)
             .query(&SoldAuctionArtifacts::from(self.clone()))
             .send()
             .await?;
@@ -292,14 +293,25 @@ impl<'df> AuctionArtifacts<'df> {
 
         Ok(root.rows)
     }
+
+    fn make_url(&self, path: &str) -> String {
+        let mut url = format!("{DF_BASE_URL}{path}?");
+
+        if !self.item_name.is_empty() {
+            url.push_str(&format!("itemName={}", encode(&self.item_name)));
+        } else if !self.item_id.is_empty() {
+            url.push_str(&format!("itemId={}", self.item_id));
+        } else {
+            panic!("item_id or item_name must be set");
+        }
+        url
+    }
 }
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct SoldAuctionArtifacts {
     limit: Option<u16>,
-    item_id: String,
-    item_name: String,
     word_type: Option<WordType>,
     word_short: Option<bool>,
 }
@@ -308,8 +320,6 @@ impl<'df> From<AuctionArtifacts<'df>> for SoldAuctionArtifacts {
     fn from(value: AuctionArtifacts<'_>) -> Self {
         let AuctionArtifacts {
             limit,
-            item_id,
-            item_name,
             word_type,
             word_short,
             ..
@@ -317,8 +327,6 @@ impl<'df> From<AuctionArtifacts<'df>> for SoldAuctionArtifacts {
 
         SoldAuctionArtifacts {
             limit,
-            item_id,
-            item_name,
             word_type,
             word_short,
         }
