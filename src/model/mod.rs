@@ -548,7 +548,7 @@ mod item {
         pub r#type: ItemType,
         pub refine: u8,
         pub reinforce: u8,
-        pub amplification_name: String,
+        pub amplification_name: Option<String>,
         #[serde(rename = "itemAvailableLevel")]
         pub available_level: u8,
     }
