@@ -16,26 +16,33 @@ const DF_BASE_URL: &str = "https://api.neople.co.kr/df";
 static STATIC_INSTACE: OnceLock<DfClient> = OnceLock::new();
 
 pub fn instance() -> DfClient {
-    STATIC_INSTACE.get_or_init(DfClient::default).clone()
+    STATIC_INSTACE
+        .get()
+        .expect("DfClient is not initialized")
+        .clone()
 }
 
 pub fn initialise(api_key: &str) -> DfClient {
-    let mut headers = reqwest::header::HeaderMap::new();
-    headers.insert("apikey", api_key.parse().unwrap());
-    let client = reqwest::Client::builder()
-        .default_headers(headers)
-        .build()
-        .unwrap();
-
     STATIC_INSTACE
-        .set(DfClient { inner: client })
-        .unwrap_or_else(|_| panic!("unable to initialise DfClient"));
-    STATIC_INSTACE.get().unwrap().clone()
+        .get_or_init(|| DfClient::new(api_key))
+        .clone()
 }
 
 #[derive(Clone, Default)]
 pub struct DfClient {
     inner: reqwest::Client,
+}
+
+impl DfClient {
+    pub fn new(api_key: &str) -> Self {
+        let mut headers = reqwest::header::HeaderMap::new();
+        headers.insert("apikey", api_key.parse().unwrap());
+        let client = reqwest::Client::builder()
+            .default_headers(headers)
+            .build()
+            .unwrap();
+        Self { inner: client }
+    }
 }
 
 impl DfClient {
