@@ -7,26 +7,35 @@ use crate::{
     DfClient, DF_BASE_URL,
 };
 
-#[derive(Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Clone)]
 pub struct AuctionArtifacts<'df> {
-    #[serde(skip)]
     client: &'df DfClient,
 
+    param: Param,
+}
+
+#[derive(Default, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Param {
     // NOTE:
     // `serde_urlencoded` serialize space to plus sign.
     // neople open api doesn't support plus sign.
     // so we need to add it manually by `urlencoding::encode`.
     #[serde(skip)]
     item_id: String,
+
     #[serde(skip)]
     item_name: String,
 
     limit: Option<u16>,
+
     #[serde(serialize_with = "Sort::nested_qs")]
     sort: Sort,
+
     word_type: Option<WordType>,
+
     word_short: Option<bool>,
+
     #[serde(rename = "q", serialize_with = "Query::nested_qs")]
     query: Query,
 }
@@ -131,73 +140,72 @@ impl<'df> AuctionArtifacts<'df> {
     pub(crate) fn new(client: &'df DfClient) -> Self {
         AuctionArtifacts {
             client,
-            limit: None,
-            word_short: None,
-            sort: Default::default(),
-            item_id: Default::default(),
-            item_name: Default::default(),
-            word_type: Default::default(),
-            query: Default::default(),
+            param: Default::default(),
         }
     }
 
+    pub fn param(mut self, param: Param) -> Self {
+        self.param = param;
+        self
+    }
+
     pub fn limit(mut self, limit: u16) -> Self {
-        self.limit = Some(limit);
+        self.param.limit = Some(limit);
         self
     }
 
     pub fn sort(mut self, sort: Sort) -> Self {
-        self.sort = sort;
+        self.param.sort = sort;
         self
     }
 
     pub fn sort_by_reinforce(mut self, sort: SortOrder) -> Self {
-        self.sort.reinforce = Some(sort);
+        self.param.sort.reinforce = Some(sort);
         self
     }
 
     pub fn sort_by_unit_price(mut self, sort: SortOrder) -> Self {
-        self.sort.unit_price = Some(sort);
+        self.param.sort.unit_price = Some(sort);
         self
     }
 
     pub fn sort_by_auction_no(mut self, sort: SortOrder) -> Self {
-        self.sort.auction_no = Some(sort);
+        self.param.sort.auction_no = Some(sort);
         self
     }
 
     pub fn item_id(mut self, item_id: String) -> Self {
-        self.item_id = item_id;
+        self.param.item_id = item_id;
         self
     }
 
     pub fn item_name(mut self, item_name: String) -> Self {
-        self.item_name = item_name;
+        self.param.item_name = item_name;
         self
     }
 
     pub fn word_type(mut self, word_type: WordType) -> Self {
-        self.word_type = Some(word_type);
+        self.param.word_type = Some(word_type);
         self
     }
 
     pub fn word_short(mut self, word_short: bool) -> Self {
-        self.word_short = Some(word_short);
+        self.param.word_short = Some(word_short);
         self
     }
 
     pub fn query(mut self, query: Query) -> Self {
-        self.query = query;
+        self.param.query = query;
         self
     }
 
     pub fn min_level(mut self, min_level: u8) -> Self {
-        self.query.min_level = Some(min_level);
+        self.param.query.min_level = Some(min_level);
         self
     }
 
     pub fn max_level(mut self, max_level: u8) -> Self {
-        self.query.max_level = Some(max_level);
+        self.param.query.max_level = Some(max_level);
         self
     }
 
@@ -206,17 +214,17 @@ impl<'df> AuctionArtifacts<'df> {
     }
 
     pub fn rarity(mut self, rarity: ItemRarity) -> Self {
-        self.query.rarity = Some(rarity);
+        self.param.query.rarity = Some(rarity);
         self
     }
 
     pub fn min_reinforce(mut self, min_reinforce: u8) -> Self {
-        self.query.min_reinforce = Some(min_reinforce);
+        self.param.query.min_reinforce = Some(min_reinforce);
         self
     }
 
     pub fn max_reinforce(mut self, max_reinforce: u8) -> Self {
-        self.query.max_reinforce = Some(max_reinforce);
+        self.param.query.max_reinforce = Some(max_reinforce);
         self
     }
 
@@ -225,12 +233,12 @@ impl<'df> AuctionArtifacts<'df> {
     }
 
     pub fn min_refine(mut self, min_refine: u8) -> Self {
-        self.query.min_refine = Some(min_refine);
+        self.param.query.min_refine = Some(min_refine);
         self
     }
 
     pub fn max_refine(mut self, max_refine: u8) -> Self {
-        self.query.max_refine = Some(max_refine);
+        self.param.query.max_refine = Some(max_refine);
         self
     }
 
@@ -239,12 +247,12 @@ impl<'df> AuctionArtifacts<'df> {
     }
 
     pub fn min_adventure_fame(mut self, min_adventure_fame: u16) -> Self {
-        self.query.min_adventure_fame = Some(min_adventure_fame);
+        self.param.query.min_adventure_fame = Some(min_adventure_fame);
         self
     }
 
     pub fn max_adventure_fame(mut self, max_adventure_fame: u16) -> Self {
-        self.query.max_adventure_fame = Some(max_adventure_fame);
+        self.param.query.max_adventure_fame = Some(max_adventure_fame);
         self
     }
 
@@ -257,7 +265,7 @@ impl<'df> AuctionArtifacts<'df> {
     pub async fn search(&self) -> crate::Result<Vec<AuctionInfo>> {
         let url = self.make_url("/auction");
 
-        let response = self.client.inner.get(url).query(self).send().await?;
+        let response = self.client.inner.get(url).query(&self.param).send().await?;
 
         let response = crate::map_api_error(response).await?;
 
@@ -278,7 +286,7 @@ impl<'df> AuctionArtifacts<'df> {
             .client
             .inner
             .get(url)
-            .query(&SoldAuctionArtifacts::from(self.clone()))
+            .query(&SoldAuctionParam::from(self.param.clone()))
             .send()
             .await?;
 
@@ -297,10 +305,13 @@ impl<'df> AuctionArtifacts<'df> {
     fn make_url(&self, path: &str) -> String {
         let mut url = format!("{DF_BASE_URL}{path}?");
 
-        if !self.item_name.is_empty() {
-            url.push_str(&format!("itemName={}", encode(&self.item_name)));
-        } else if !self.item_id.is_empty() {
-            url.push_str(&format!("itemId={}", self.item_id));
+        let name = &self.param.item_name;
+        let id = &self.param.item_id;
+
+        if !name.is_empty() {
+            url.push_str(&format!("itemName={}", encode(name)));
+        } else if !id.is_empty() {
+            url.push_str(&format!("itemId={}", id));
         } else {
             panic!("item_id or item_name must be set");
         }
@@ -310,22 +321,22 @@ impl<'df> AuctionArtifacts<'df> {
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-struct SoldAuctionArtifacts {
+struct SoldAuctionParam {
     limit: Option<u16>,
     word_type: Option<WordType>,
     word_short: Option<bool>,
 }
 
-impl<'df> From<AuctionArtifacts<'df>> for SoldAuctionArtifacts {
-    fn from(value: AuctionArtifacts<'_>) -> Self {
-        let AuctionArtifacts {
+impl From<Param> for SoldAuctionParam {
+    fn from(value: Param) -> Self {
+        let Param {
             limit,
             word_type,
             word_short,
             ..
         } = value;
 
-        SoldAuctionArtifacts {
+        SoldAuctionParam {
             limit,
             word_type,
             word_short,
