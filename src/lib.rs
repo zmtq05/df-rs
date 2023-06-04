@@ -2,6 +2,7 @@ pub mod api;
 pub mod error;
 pub use error::Error;
 pub mod model;
+pub mod util;
 
 use std::sync::OnceLock;
 

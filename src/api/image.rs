@@ -2,6 +2,7 @@ use bytes::Bytes;
 
 use crate::{
     model::{Character, Server},
+    util::AsItem,
     DfClient,
 };
 
@@ -36,12 +37,16 @@ impl<'df> ImageHandler<'df> {
         self._character(character.server, &character.id, zoom).await
     }
 
-    pub async fn item(&self, item_id: &str) -> crate::Result<Bytes> {
+    pub async fn _item(&self, item_id: &str) -> crate::Result<Bytes> {
         let response = self
             .client
             .get(&format!("{BASE_URL}/items/{item_id}"))
             .await?;
 
         Ok(response.bytes().await?)
+    }
+
+    pub async fn item<T: AsItem>(&self, item: &T) -> crate::Result<Bytes> {
+        self._item(item.id()).await
     }
 }
