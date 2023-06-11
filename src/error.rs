@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+use reqwest::Response;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -16,6 +17,19 @@ pub struct ApiError {
     pub status: u16,
     pub code: ErrorCode,
     pub message: String,
+}
+
+impl ApiError {
+    pub(crate) async fn from_response(response: Response) -> Self {
+        #[derive(Deserialize)]
+        struct OuterError {
+            error: ApiError,
+        }
+
+        // origin: { "error": { "status": 404, ... } }
+
+        response.json::<OuterError>().await.unwrap().error
+    }
 }
 
 impl Display for ApiError {

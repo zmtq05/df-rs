@@ -1,5 +1,6 @@
 pub mod api;
 pub mod error;
+use error::ApiError;
 pub use error::Error;
 pub mod model;
 pub mod util;
@@ -64,10 +65,9 @@ impl DfClient {
 }
 
 async fn map_api_error(response: Response) -> Result<Response> {
-    let status = response.status();
-    if status.is_success() {
-        Ok(response)
-    } else {
-        Err(Error::Api(response.json().await?))
+    if response.status().is_success() {
+        return Ok(response);
     }
+
+    Err(Error::Api(ApiError::from_response(response).await))
 }
