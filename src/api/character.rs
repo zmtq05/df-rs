@@ -1,5 +1,6 @@
 //! TODO: UNTESTED
 
+use futures::join;
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{
@@ -188,15 +189,27 @@ impl<'df> SpecificCharacterBuffHandler<'df> {
         self.handler.get(&format!("skill/buff/equip/{dst}")).await
     }
 
+    /// [`BuffEnhance::avatars`] and [`BuffEnhance::creature`] are always `None`.
     pub async fn equipments(&self) -> Result<BuffEnhance> {
         self.get("equipment").await
     }
 
+    /// [`BuffEnhance::equipments`] and [`BuffEnhance::creature`] are always `None`.
     pub async fn avatars(&self) -> Result<BuffEnhance> {
         self.get("avatar").await
     }
 
+    /// [`BuffEnhance::equipments`] and [`BuffEnhance::avatars`] are always `None`.
     pub async fn creature(&self) -> Result<BuffEnhance> {
         self.get("creature").await
+    }
+
+    /// Convenience method. using [`futures::join`].
+    pub async fn all(&self) -> Result<BuffEnhance> {
+        let (e, a, c) = join![self.equipments(), self.avatars(), self.creature()];
+        let mut e = e?;
+        e.avatars = a?.avatars;
+        e.creature = c?.creature;
+        Ok(e)
     }
 }
