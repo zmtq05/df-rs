@@ -7,7 +7,7 @@ pub mod util;
 
 use std::sync::OnceLock;
 
-use api::{auction::AuctionArtifacts, image::ImageHandler};
+use api::{auction::AuctionArtifacts, character::CharacterHandler, image::ImageHandler};
 use reqwest::Response;
 
 type Result<T, E = Error> = std::result::Result<T, E>;
@@ -53,6 +53,10 @@ impl DfClient {
 
     pub fn auction(&self) -> AuctionArtifacts<'_> {
         AuctionArtifacts::new(self)
+    }
+
+    pub fn character(&self) -> CharacterHandler<'_> {
+        CharacterHandler::new(self)
     }
 }
 

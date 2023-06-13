@@ -70,6 +70,72 @@ pub struct JobGrow {
     pub name: String,
 }
 
+macro_rules! decl_ty_extends_CharacterInfo {
+    (
+        $(#[$attr:meta])*
+        pub struct $name:ident {
+            $(#[$field_attr:meta])*
+            pub $field:ident: $field_type:ty,
+        }
+    ) => {
+        $(#[$attr])*
+        pub struct $name {
+            #[serde(rename = "characterId")]
+            pub id: String,
+            #[serde(rename = "characterName")]
+            pub name: String,
+
+            pub level: u8,
+
+            #[serde(flatten)]
+            pub job: Job,
+
+            #[serde(flatten)]
+            pub job_grow: JobGrow,
+
+            #[serde(default)] // 오래된 캐릭터의 경우 null 일 수 있음
+            pub adventure_name: String,
+
+            pub guild: Option<Guild>,
+
+            $(#[$field_attr])*
+            pub $field: $field_type,
+        }
+    };
+}
+
+decl_ty_extends_CharacterInfo! {
+    #[derive(Clone, Deserialize)]
+    pub struct CharacterEquipments {
+        #[serde(rename = "equipment")]
+        pub equipments: Vec<Equipment>,
+    }
+}
+decl_ty_extends_CharacterInfo! {
+    #[derive(Clone, Deserialize)]
+    pub struct CharacterAvatars {
+        #[serde(rename = "avatar")]
+        pub avatars: Vec<Equipment>,
+    }
+}
+decl_ty_extends_CharacterInfo! {
+    #[derive(Clone, Deserialize)]
+    pub struct CharacterCreature {
+        pub creature: Creature,
+    }
+}
+decl_ty_extends_CharacterInfo! {
+    #[derive(Clone, Deserialize)]
+    pub struct CharacterFlag {
+        pub flag: Flag,
+    }
+}
+decl_ty_extends_CharacterInfo! {
+    #[derive(Clone, Deserialize)]
+    pub struct CharacterTalismans {
+        pub talismans: Vec<Talisman>,
+    }
+}
 // ------------------------------------
 
 /// ## List of keys - CharacterStatus
@@ -351,7 +417,7 @@ pub struct Gem {
 }
 
 // ------------------------------------
-
+/*
 #[derive(Clone, Deserialize)]
 pub struct TalismanWithRunes {
     pub talisman: Talisman,
@@ -366,12 +432,52 @@ pub struct Talisman {
     pub item: Item,
     pub rune_types: Vec<String>,
 }
+ */
 
 #[derive(Clone, Deserialize)]
 pub struct Rune {
     pub slot_no: u8,
     #[serde(flatten)]
     pub item: Item,
+}
+
+#[derive(Clone)]
+pub struct Talisman {
+    pub slot_no: u8,
+    pub item: Item,
+    pub runes: Vec<Rune>,
+}
+
+impl<'de> Deserialize<'de> for Talisman {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        #[allow(non_snake_case)]
+        #[derive(Deserialize)]
+        struct __TalismanInner {
+            itemId: String,
+            itemName: String,
+            slotNo: u8,
+        }
+        #[derive(Deserialize)]
+        struct __Talisman {
+            runes: Vec<Rune>,
+            talisman: __TalismanInner,
+        }
+
+        let __Talisman { runes, talisman } = __Talisman::deserialize(deserializer)?;
+        let talisman = Talisman {
+            slot_no: talisman.slotNo,
+            item: Item {
+                id: talisman.itemId,
+                name: talisman.itemName,
+            },
+            runes,
+        };
+
+        Ok(talisman)
+    }
 }
 
 // ------------------------------------
@@ -416,7 +522,7 @@ pub enum SkillCostType {
     TP,
 }
 
-mod buff {
+pub mod buff {
     use serde::Deserialize;
 
     use crate::model::serde_helper;
