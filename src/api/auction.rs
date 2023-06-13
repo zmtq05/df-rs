@@ -1,5 +1,5 @@
 use convert_case::{Case, Casing};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use urlencoding::encode;
 
 use crate::{
@@ -12,6 +12,49 @@ pub struct AuctionArtifacts<'df> {
     client: &'df DfClient,
 
     param: Param,
+}
+
+impl<'df> AuctionArtifacts<'df> {
+    fn make_url(&self, path: &str) -> String {
+        let mut url = format!("{DF_BASE_URL}/{path}?");
+
+        let name = &self.param.item_name;
+        let id = &self.param.item_id;
+
+        if !name.is_empty() {
+            url.push_str(&format!("itemName={}", encode(name)));
+        } else if !id.is_empty() {
+            url.push_str(&format!("itemId={}", id));
+        } else {
+            panic!("item_id or item_name must be set");
+        }
+        url
+    }
+
+    pub async fn search(&self) -> crate::Result<Vec<AuctionInfo>> {
+        let url = self.make_url("auction");
+
+        let resp = self.client.inner.get(url).query(&self.param).send().await?;
+        let resp = crate::map_api_error(resp).await?;
+
+        Ok(unwrap_rows!(resp, AuctionInfo))
+    }
+
+    pub async fn sold(&self) -> crate::Result<Vec<SoldAuctionInfo>> {
+        let url = self.make_url("auction-sold");
+
+        let resp = self
+            .client
+            .inner
+            .get(url)
+            .query(&SoldAuctionParam::from(self.param.clone()))
+            .send()
+            .await?;
+
+        let resp = crate::map_api_error(resp).await?;
+
+        Ok(unwrap_rows!(resp, SoldAuctionInfo))
+    }
 }
 
 #[derive(Default, Clone, Serialize)]
@@ -258,64 +301,6 @@ impl<'df> AuctionArtifacts<'df> {
 
     pub fn adventure_fame(self, min: u16, max: u16) -> Self {
         self.min_adventure_fame(min).max_adventure_fame(max)
-    }
-}
-
-impl<'df> AuctionArtifacts<'df> {
-    pub async fn search(&self) -> crate::Result<Vec<AuctionInfo>> {
-        let url = self.make_url("/auction");
-
-        let response = self.client.inner.get(url).query(&self.param).send().await?;
-
-        let response = crate::map_api_error(response).await?;
-
-        #[derive(Deserialize)]
-        struct Root {
-            rows: Vec<AuctionInfo>,
-        }
-
-        let root: Root = response.json().await?;
-
-        Ok(root.rows)
-    }
-
-    pub async fn sold(&self) -> crate::Result<Vec<SoldAuctionInfo>> {
-        let url = self.make_url("/auction-sold");
-
-        let response = self
-            .client
-            .inner
-            .get(url)
-            .query(&SoldAuctionParam::from(self.param.clone()))
-            .send()
-            .await?;
-
-        let response = crate::map_api_error(response).await?;
-
-        #[derive(Deserialize)]
-        struct Root {
-            rows: Vec<SoldAuctionInfo>,
-        }
-
-        let root: Root = response.json().await?;
-
-        Ok(root.rows)
-    }
-
-    fn make_url(&self, path: &str) -> String {
-        let mut url = format!("{DF_BASE_URL}{path}?");
-
-        let name = &self.param.item_name;
-        let id = &self.param.item_id;
-
-        if !name.is_empty() {
-            url.push_str(&format!("itemName={}", encode(name)));
-        } else if !id.is_empty() {
-            url.push_str(&format!("itemId={}", id));
-        } else {
-            panic!("item_id or item_name must be set");
-        }
-        url
     }
 }
 
