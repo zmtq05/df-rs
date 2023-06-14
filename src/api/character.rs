@@ -1,5 +1,6 @@
 //! TODO: UNTESTED
 
+use bytes::Bytes;
 use futures::join;
 use serde::{de::DeserializeOwned, Serialize};
 
@@ -136,8 +137,7 @@ impl<'df> SpecificCharacterHandler<'df> {
         let resp = self
             .client
             .get(&format!(
-                "{BASE_URL}/servers/{server}/characters/{id}/{dst}",
-                BASE_URL = crate::DF_BASE_URL,
+                "/servers/{server}/characters/{id}/{dst}",
                 server = self.server,
                 id = self.character_id,
                 dst = dst,
@@ -173,6 +173,13 @@ impl<'df> SpecificCharacterHandler<'df> {
 
     pub fn buff(&self) -> SpecificCharacterBuffHandler<'_> {
         SpecificCharacterBuffHandler::new(self)
+    }
+
+    pub async fn image(&self, zoom: u8) -> Result<Bytes> {
+        self.client
+            .image()
+            ._character(self.server, &self.character_id, zoom)
+            .await
     }
 }
 

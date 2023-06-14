@@ -12,15 +12,6 @@ macro_rules! unwrap_rows {
     }};
 }
 
-#[derive(Default, Clone, Serialize)]
-#[serde(rename_all = "lowercase")]
-pub enum WordType {
-    #[default]
-    Match,
-    Front,
-    Full,
-}
-
 macro_rules! nested_query {
     ($target:ty; $($field:ident),*) => {
         impl serde::Serialize for $target {
@@ -40,6 +31,15 @@ macro_rules! nested_query {
             }
         }
     };
+}
+
+#[derive(Default, Clone, Copy, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum WordType {
+    #[default]
+    Match,
+    Front,
+    Full,
 }
 
 pub mod auction;

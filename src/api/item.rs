@@ -1,3 +1,4 @@
+use bytes::Bytes;
 use serde::Serialize;
 
 use crate::{
@@ -39,6 +40,10 @@ impl<'df> ItemHandler<'df> {
         let resp = self.client.get(&format!("/items/{item_id}")).await?;
 
         Ok(resp.json().await.unwrap())
+    }
+
+    pub async fn image(&self, item_id: &str) -> Result<Bytes> {
+        self.client.image()._item(item_id).await
     }
 }
 
