@@ -1,7 +1,7 @@
 use std::{fmt::Display, str::FromStr};
 
 use serde::Deserialize;
-use serde_with::DeserializeFromStr;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
 
 use super::serde_helper;
 
@@ -42,7 +42,22 @@ pub struct ItemExt {
     pub available_level: u8,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, DeserializeFromStr)]
+#[derive(Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchItem {
+    #[serde(rename = "itemId")]
+    pub id: String,
+    #[serde(rename = "itemName")]
+    pub name: String,
+    #[serde(rename = "itemRarity")]
+    pub rarity: ItemRarity,
+    #[serde(flatten)]
+    pub r#type: ItemType,
+    #[serde(rename = "itemAvailableLevel")]
+    pub available_level: u8,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, DeserializeFromStr, SerializeDisplay)]
 pub enum ItemRarity {
     Common,
     Uncommon,

@@ -7,6 +7,8 @@ use crate::{
     DfClient, DF_BASE_URL,
 };
 
+use super::WordType;
+
 #[derive(Clone)]
 pub struct AuctionArtifacts<'df> {
     client: &'df DfClient,
@@ -119,15 +121,6 @@ impl Sort {
 pub enum SortOrder {
     Asc,
     Desc,
-}
-
-#[derive(Default, Clone, Serialize)]
-#[serde(rename_all = "lowercase")]
-pub enum WordType {
-    #[default]
-    Match,
-    Front,
-    Full,
 }
 
 #[derive(Default, Clone)]

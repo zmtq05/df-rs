@@ -11,7 +11,7 @@ use crate::{
     DfClient, Result,
 };
 
-use super::auction::WordType;
+use super::WordType;
 
 pub struct CharacterHandler<'df> {
     client: &'df DfClient,

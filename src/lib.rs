@@ -2,12 +2,15 @@ pub mod api;
 pub mod error;
 use error::ApiError;
 pub use error::Error;
+use serde::Serialize;
 pub mod model;
 pub mod util;
 
 use std::sync::OnceLock;
 
-use api::{auction::AuctionArtifacts, character::CharacterHandler, image::ImageHandler};
+use api::{
+    auction::AuctionArtifacts, character::CharacterHandler, image::ImageHandler, item::ItemHandler,
+};
 use reqwest::Response;
 
 type Result<T, E = Error> = std::result::Result<T, E>;
@@ -58,11 +61,27 @@ impl DfClient {
     pub fn character(&self) -> CharacterHandler<'_> {
         CharacterHandler::new(self)
     }
+
+    pub fn item(&self) -> ItemHandler<'_> {
+        ItemHandler::new(self)
+    }
 }
 
 impl DfClient {
     async fn get(&self, url: &str) -> Result<Response> {
-        let response = self.inner.get(url).send().await?;
+        self.get_with_query::<()>(url, None).await
+    }
+
+    async fn get_with_query<T>(&self, url: &str, query: Option<&T>) -> Result<Response>
+    where
+        T: Serialize + ?Sized,
+    {
+        let url = if url.starts_with("https://") {
+            url.to_owned()
+        } else {
+            format!("{}{}", DF_BASE_URL, url)
+        };
+        let response = self.inner.get(url).query(&query).send().await?;
 
         map_api_error(response).await
     }
