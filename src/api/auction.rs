@@ -93,13 +93,13 @@ impl<'df> AuctionArtifacts<'df> {
         self
     }
 
-    pub fn item_id(&mut self, item_id: String) -> &mut Self {
-        self.param.item_id = item_id;
+    pub fn item_id(&mut self, item_id: impl Into<String>) -> &mut Self {
+        self.param.item_id = item_id.into();
         self
     }
 
-    pub fn item_name(&mut self, item_name: String) -> &mut Self {
-        self.param.item_name = item_name;
+    pub fn item_name(&mut self, item_name: impl Into<String>) -> &mut Self {
+        self.param.item_name = item_name.into();
         self
     }
 
