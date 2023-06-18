@@ -235,7 +235,7 @@ pub struct Set {
 pub struct ReinforceSkill {
     #[serde(flatten)]
     pub job: super::character::Job,
-    pub skiils: Vec<ReinforceSkillInfo>,
+    pub skills: Vec<ReinforceSkillInfo>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
