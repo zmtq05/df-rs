@@ -1,11 +1,11 @@
 use std::{fmt::Display, str::FromStr};
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 
 use super::serde_helper;
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Item {
     #[serde(rename = "itemId")]
     pub id: String,
@@ -13,7 +13,7 @@ pub struct Item {
     pub name: String,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ItemWithRarity {
     #[serde(rename = "itemId")]
@@ -24,7 +24,7 @@ pub struct ItemWithRarity {
     pub rarity: ItemRarity,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ItemExt {
     #[serde(rename = "itemId")]
@@ -42,7 +42,7 @@ pub struct ItemExt {
     pub available_level: u8,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchItem {
     #[serde(rename = "itemId")]
@@ -57,7 +57,9 @@ pub struct SearchItem {
     pub available_level: u8,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, DeserializeFromStr, SerializeDisplay)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, DeserializeFromStr, SerializeDisplay,
+)]
 pub enum ItemRarity {
     Common,
     Uncommon,
@@ -104,7 +106,7 @@ impl Display for ItemRarity {
     }
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ItemType {
     #[serde(rename = "itemTypeId")]
     pub id: String,
@@ -114,7 +116,7 @@ pub struct ItemType {
     pub detail: ItemTypeDetail,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ItemTypeDetail {
     #[serde(rename = "itemTypeDetailId")]
     pub id: String,
@@ -124,7 +126,7 @@ pub struct ItemTypeDetail {
 
 // ------------------------------------
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ItemInfo {
     #[serde(rename = "itemId")]
@@ -165,7 +167,7 @@ pub struct ItemInfo {
     pub reinforce_skill: Option<Vec<ReinforceSkill>>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Explain {
     #[serde(rename = "itemExplain")]
     pub value: String,
@@ -175,7 +177,7 @@ pub struct Explain {
 
 // ------------------------------------ ObtainInfo START
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ObtainInfo {
     pub dungeon: Option<Vec<DungeonObtainInfo>>,
@@ -186,7 +188,7 @@ pub struct ObtainInfo {
     pub etc: Option<Vec<EtcObtainInfo>>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DungeonObtainInfo {
     // dungeon type
     //
@@ -197,7 +199,7 @@ pub struct DungeonObtainInfo {
     pub dungeons: Vec<String>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ShopObtainInfo {
     // ex) 모험단 상점, NPC 린지 로섬, ...
     pub name: String,
@@ -205,13 +207,13 @@ pub struct ShopObtainInfo {
     pub details: Vec<String>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct EtcObtainInfo {
     pub name: String,
     pub rows: Vec<EtcObtainInfoRow>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct EtcObtainInfoRow {
     pub name: String,
     pub details: Option<Vec<String>>,
@@ -219,7 +221,7 @@ pub struct EtcObtainInfoRow {
 
 // ------------------------------------ ObtainInfo END
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Set {
     #[serde(rename = "setItemId")]
     pub id: String,
@@ -229,14 +231,14 @@ pub struct Set {
 
 // ------------------------------------
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ReinforceSkill {
     #[serde(flatten)]
     pub job: super::character::Job,
     pub skiils: Vec<ReinforceSkillInfo>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ReinforceSkillInfo {
     #[serde(rename = "skillId")]
     pub id: String,
@@ -247,21 +249,21 @@ pub struct ReinforceSkillInfo {
 
 // ------------------------------------
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct GrowInfo {
     pub transfer: Option<bool>,
     pub total: GrowTotal,
     pub options: Vec<GrowOption>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct GrowTotal {
     pub damage: i32,
     pub buff: i32,
     pub level: i32,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GrowOption {
     pub level: u8,
@@ -274,7 +276,7 @@ pub struct GrowOption {
     pub transfer: Option<bool>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct GrowOptionDefault {
     pub damage: i32,
     pub buff: i32,

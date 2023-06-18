@@ -1,13 +1,13 @@
 use std::{collections::HashMap, fmt::Display};
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use super::{
     item::{Item, ItemExt, ItemRarity, ItemWithRarity},
     serde_helper, Server, Slot,
 };
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Character {
     #[serde(rename = "characterId")]
     pub id: String,
@@ -24,7 +24,7 @@ pub struct Character {
     pub job_grow: JobGrow,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterInfo {
     #[serde(rename = "characterId")]
@@ -46,7 +46,7 @@ pub struct CharacterInfo {
     pub guild: Option<Guild>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Guild {
     #[serde(rename = "guildId")]
     pub id: String,
@@ -54,7 +54,7 @@ pub struct Guild {
     pub name: String,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Job {
     #[serde(rename = "jobId")]
     pub id: String,
@@ -62,7 +62,7 @@ pub struct Job {
     pub name: String,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct JobGrow {
     #[serde(rename = "jobGrowId")]
     pub id: String,
@@ -105,33 +105,33 @@ macro_rules! decl_ty_extends_CharacterInfo {
 }
 
 decl_ty_extends_CharacterInfo! {
-    #[derive(Clone, Deserialize)]
+    #[derive(Debug, Clone, Deserialize, Serialize)]
     pub struct CharacterEquipments {
         #[serde(rename = "equipment")]
         pub equipments: Vec<Equipment>,
     }
 }
 decl_ty_extends_CharacterInfo! {
-    #[derive(Clone, Deserialize)]
+    #[derive(Debug, Clone, Deserialize, Serialize)]
     pub struct CharacterAvatars {
         #[serde(rename = "avatar")]
         pub avatars: Vec<Equipment>,
     }
 }
 decl_ty_extends_CharacterInfo! {
-    #[derive(Clone, Deserialize)]
+    #[derive(Debug, Clone, Deserialize, Serialize)]
     pub struct CharacterCreature {
         pub creature: Creature,
     }
 }
 decl_ty_extends_CharacterInfo! {
-    #[derive(Clone, Deserialize)]
+    #[derive(Debug, Clone, Deserialize, Serialize)]
     pub struct CharacterFlag {
         pub flag: Flag,
     }
 }
 decl_ty_extends_CharacterInfo! {
-    #[derive(Clone, Deserialize)]
+    #[derive(Debug, Clone, Deserialize, Serialize)]
     pub struct CharacterTalismans {
         pub talismans: Vec<Talisman>,
     }
@@ -209,10 +209,10 @@ decl_ty_extends_CharacterInfo! {
 /// ## List of key - Enchant
 ///
 /// TODO
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Status(pub HashMap<String, StatusValue>);
 
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct StatusValue {
     pub value: f64,
     pub suffix: Option<char>,
@@ -240,7 +240,7 @@ impl<'de> Deserialize<'de> for Status {
     where
         D: serde::Deserializer<'de>,
     {
-        #[derive(Deserialize)]
+        #[derive(Debug, Deserialize)]
 
         struct StatusInner {
             name: String,
@@ -274,7 +274,7 @@ impl<'de> Deserialize<'de> for Status {
 
 // ------------------------------------
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Equipment {
     #[serde(flatten)]
@@ -300,7 +300,7 @@ pub struct Equipment {
     pub bakal_info: Option<FusionInfo>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Enchant {
     pub explain: Option<String>,
@@ -308,12 +308,12 @@ pub struct Enchant {
     pub reinforce_skill: Option<Vec<super::item::ReinforceSkill>>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FusionInfo {
     pub options: Vec<FusionOption>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FusionOption {
     #[serde(default)]
@@ -340,7 +340,7 @@ pub struct FusionOption {
 */
 // ------------------------------------
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Avatar {
     #[serde(flatten)]
@@ -354,7 +354,7 @@ pub struct Avatar {
     pub emblems: Vec<Emblem>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Emblem {
     pub slot_no: u8,
@@ -365,7 +365,7 @@ pub struct Emblem {
 
 // ------------------------------------
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Creature {
     #[serde(flatten)]
@@ -375,14 +375,14 @@ pub struct Creature {
     pub artifacts: Vec<Artifact>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreatureClone {
     pub item_id: Option<String>,
     pub item_name: Option<String>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Artifact {
     pub slot_color: String,
@@ -393,7 +393,7 @@ pub struct Artifact {
 
 // ------------------------------------
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Flag {
     #[serde(flatten)]
@@ -408,7 +408,7 @@ pub struct Flag {
     pub gems: Vec<Gem>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Gem {
     pub slot_no: u8,
@@ -417,31 +417,15 @@ pub struct Gem {
 }
 
 // ------------------------------------
-/*
-#[derive(Clone, Deserialize)]
-pub struct TalismanWithRunes {
-    pub talisman: Talisman,
-    pub runes: Vec<Rune>,
-}
 
-#[derive(Clone, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Talisman {
-    pub slot_no: u8,
-    #[serde(flatten)]
-    pub item: Item,
-    pub rune_types: Vec<String>,
-}
- */
-
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Rune {
     pub slot_no: u8,
     #[serde(flatten)]
     pub item: Item,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Talisman {
     pub slot_no: u8,
     pub item: Item,
@@ -494,18 +478,18 @@ impl<'de> Deserialize<'de> for Talisman {
 
 NOTE: just return SkillStyle
 */
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct SkillStyleOuter {
     pub style: SkillStyle,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct SkillStyle {
     pub active: Vec<Skill>,
     pub passive: Vec<Skill>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Skill {
     pub id: String,
@@ -515,7 +499,7 @@ pub struct Skill {
     pub cost_type: SkillCostType,
 }
 
-#[derive(Clone, Copy, Deserialize)]
+#[derive(Debug, Clone, Copy, Deserialize, Serialize)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum SkillCostType {
     SP,
@@ -523,11 +507,11 @@ pub enum SkillCostType {
 }
 
 pub mod buff {
-    use serde::Deserialize;
+    use serde::{Deserialize, Serialize};
 
     use crate::model::serde_helper;
 
-    #[derive(Clone, Deserialize)]
+    #[derive(Debug, Clone, Deserialize, Serialize)]
     #[serde(rename_all = "camelCase")]
     pub struct BuffEnhance {
         #[serde(rename = "skillInfo")]
@@ -543,7 +527,7 @@ pub mod buff {
         pub creature: Option<super::Creature>,
     }
 
-    #[derive(Debug, Clone, Deserialize)]
+    #[derive(Debug, Clone, Deserialize, Serialize)]
     #[serde(rename_all = "camelCase")]
     pub struct SkillInfo {
         #[serde(rename = "skillId")]
@@ -552,7 +536,7 @@ pub mod buff {
         pub option: SkillOption,
     }
 
-    #[derive(Debug, Clone, Deserialize)]
+    #[derive(Debug, Clone, Deserialize, Serialize)]
     pub struct SkillOption {
         // skill level
         pub level: u8,

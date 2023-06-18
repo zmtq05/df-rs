@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use super::item::ItemExt;
 
@@ -6,7 +6,7 @@ use super::item::ItemExt;
 // format: "yyyy-MM-dd hh:mm:ss"
 type Date = String;
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AuctionInfo {
     #[serde(rename = "auctionNo")]
@@ -22,7 +22,7 @@ pub struct AuctionInfo {
     pub average_price: u32,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SoldAuctionInfo {
     pub sold_date: Date,
