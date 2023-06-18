@@ -1,0 +1,13 @@
+{
+	"async test function": {
+		"scope": "rust",
+		"prefix": "atfn",
+		"body": [
+			"#[tokio::test]",
+			"async fn ${1:test_name}() {",
+			"\t$0",
+			"}"
+		],
+		"description": "async test function"
+	}
+}
