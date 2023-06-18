@@ -16,15 +16,73 @@ use super::WordType;
 
 pub struct CharacterHandler<'df> {
     client: &'df DfClient,
+
+    search_param: Option<CharacterSearchParameter>,
 }
 
 impl<'df> CharacterHandler<'df> {
     pub(crate) fn new(client: &'df DfClient) -> Self {
-        Self { client }
+        Self {
+            client,
+            search_param: None,
+        }
     }
 
-    pub fn search(&self) -> CharacterSearchBuilder<'df> {
-        CharacterSearchBuilder::new(self.client)
+    fn param_mut(&mut self) -> &mut CharacterSearchParameter {
+        self.search_param.get_or_insert_with(Default::default)
+    }
+
+    pub fn param(mut self, param: CharacterSearchParameter) -> Self {
+        self.search_param = Some(param);
+        self
+    }
+
+    pub fn name(mut self, character_name: impl Into<String>) -> Self {
+        self.param_mut().name(character_name);
+        self
+    }
+
+    pub fn server(mut self, server: Server) -> Self {
+        self.param_mut().server(server);
+        self
+    }
+
+    pub fn job_id(mut self, job_id: impl Into<String>) -> Self {
+        self.param_mut().job_id(job_id);
+        self
+    }
+
+    pub fn job_grow_id(mut self, job_grow_id: impl Into<String>) -> Self {
+        self.param_mut().job_grow_id(job_grow_id);
+        self
+    }
+
+    pub fn limit(mut self, limit: u8) -> Self {
+        self.param_mut().limit(limit);
+        self
+    }
+
+    pub fn word_type(mut self, word_type: WordType) -> Self {
+        self.param_mut().word_type(word_type);
+        self
+    }
+
+    pub async fn search(&self) -> Result<Vec<Character>> {
+        let param = self.search_param.as_ref().unwrap();
+        let resp = self
+            .client
+            .get_with_query(
+                &format!(
+                    "/servers/{server}/characters?characterName={name}",
+                    server = param.server,
+                    name = param.name.as_ref().expect("must be call `name()`"),
+                ),
+                Some(param),
+            )
+            .await?;
+
+        let characters = unwrap_rows!(resp, Character);
+        Ok(characters)
     }
 
     pub fn _of(&self, server: Server, character_id: &str) -> SpecificCharacterHandler<'df> {
@@ -38,9 +96,7 @@ impl<'df> CharacterHandler<'df> {
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct CharacterSearchBuilder<'df> {
-    #[serde(skip)]
-    client: &'df DfClient,
+pub struct CharacterSearchParameter {
     #[serde(skip)]
     server: Server,
     #[serde(skip)]
@@ -52,69 +108,48 @@ pub struct CharacterSearchBuilder<'df> {
     limit: Option<u8>,
 }
 
-impl<'df> CharacterSearchBuilder<'df> {
-    fn new(client: &'df DfClient) -> Self {
+impl Default for CharacterSearchParameter {
+    fn default() -> Self {
         Self {
-            client,
             server: Server::All,
-            name: None,
-            job_id: None,
-            job_grow_id: None,
-            word_type: None,
-            limit: None,
+            name: Default::default(),
+            job_id: Default::default(),
+            job_grow_id: Default::default(),
+            word_type: Default::default(),
+            limit: Default::default(),
         }
     }
+}
 
-    pub fn server(mut self, server: Server) -> Self {
+impl CharacterSearchParameter {
+    pub fn server(&mut self, server: Server) -> &mut Self {
         self.server = server;
         self
     }
 
-    pub fn name(mut self, name: String) -> Self {
-        self.name = Some(name);
+    pub fn job_id(&mut self, job_id: impl Into<String>) -> &mut Self {
+        self.job_id = Some(job_id.into());
         self
     }
 
-    pub fn job_id(mut self, job_id: String) -> Self {
-        self.job_id = Some(job_id);
+    pub fn job_grow_id(&mut self, job_grow_id: impl Into<String>) -> &mut Self {
+        self.job_grow_id = Some(job_grow_id.into());
         self
     }
 
-    pub fn job_grow_id(mut self, job_grow_id: String) -> Self {
-        self.job_grow_id = Some(job_grow_id);
-        self
-    }
-
-    pub fn word_type(mut self, word_type: WordType) -> Self {
+    pub fn word_type(&mut self, word_type: WordType) -> &mut Self {
         self.word_type = Some(word_type);
         self
     }
 
-    pub fn limit(mut self, limit: u8) -> Self {
+    pub fn limit(&mut self, limit: u8) -> &mut Self {
         self.limit = Some(limit);
         self
     }
 
-    /// # Panics
-    ///
-    /// You must set `name` before calling this method.
-    pub async fn execute(&self) -> Result<Vec<Character>> {
-        let resp = self
-            .client
-            .inner
-            .get(format!(
-                "{BASE_URL}/servers/{server}/characters?characterName={name}",
-                BASE_URL = crate::DF_BASE_URL,
-                server = self.server,
-                name = self.name.clone().expect("name must be set"),
-            ))
-            .query(self)
-            .send()
-            .await?;
-        let resp = crate::map_api_error(resp).await?;
-
-        let characters = unwrap_rows!(resp, Character);
-        Ok(characters)
+    fn name(&mut self, name: impl Into<String>) -> &mut Self {
+        self.name = Some(name.into());
+        self
     }
 }
 
