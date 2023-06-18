@@ -14,14 +14,15 @@ use crate::{
 
 use super::WordType;
 
-pub struct CharacterHandler<'df> {
-    client: &'df DfClient,
+#[derive(Clone)]
+pub struct CharacterHandler {
+    client: DfClient,
 
     search_param: Option<CharacterSearchParameter>,
 }
 
-impl<'df> CharacterHandler<'df> {
-    pub(crate) fn new(client: &'df DfClient) -> Self {
+impl CharacterHandler {
+    pub(crate) fn new(client: DfClient) -> Self {
         Self {
             client,
             search_param: None,
@@ -85,16 +86,16 @@ impl<'df> CharacterHandler<'df> {
         Ok(characters)
     }
 
-    pub fn _of(&self, server: Server, character_id: &str) -> SpecificCharacterHandler<'df> {
-        SpecificCharacterHandler::new(self.client, server, character_id)
+    pub fn _of(&self, server: Server, character_id: &str) -> SpecificCharacterHandler {
+        SpecificCharacterHandler::new(self.client.clone(), server, character_id)
     }
 
-    pub fn of(&self, character: &Character) -> SpecificCharacterHandler<'df> {
+    pub fn of(&self, character: &Character) -> SpecificCharacterHandler {
         self._of(character.server, &character.id)
     }
 }
 
-#[derive(Serialize)]
+#[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterSearchParameter {
     #[serde(skip)]
@@ -153,14 +154,15 @@ impl CharacterSearchParameter {
     }
 }
 
-pub struct SpecificCharacterHandler<'df> {
-    client: &'df DfClient,
+#[derive(Clone)]
+pub struct SpecificCharacterHandler {
+    client: DfClient,
     server: Server,
     character_id: String,
 }
 
-impl<'df> SpecificCharacterHandler<'df> {
-    fn new(client: &'df DfClient, server: Server, character_id: &str) -> Self {
+impl SpecificCharacterHandler {
+    fn new(client: DfClient, server: Server, character_id: &str) -> Self {
         Self {
             client,
             server,
@@ -206,8 +208,8 @@ impl<'df> SpecificCharacterHandler<'df> {
         self.get("equip/talisman").await
     }
 
-    pub fn buff(&self) -> SpecificCharacterBuffHandler<'_> {
-        SpecificCharacterBuffHandler::new(self)
+    pub fn buff(&self) -> SpecificCharacterBuffHandler {
+        SpecificCharacterBuffHandler::new(self.clone())
     }
 
     pub async fn image(&self, zoom: u8) -> Result<Bytes> {
@@ -218,12 +220,13 @@ impl<'df> SpecificCharacterHandler<'df> {
     }
 }
 
-pub struct SpecificCharacterBuffHandler<'df> {
-    handler: &'df SpecificCharacterHandler<'df>,
+#[derive(Clone)]
+pub struct SpecificCharacterBuffHandler {
+    handler: SpecificCharacterHandler,
 }
 
-impl<'df> SpecificCharacterBuffHandler<'df> {
-    fn new(handler: &'df SpecificCharacterHandler<'df>) -> Self {
+impl SpecificCharacterBuffHandler {
+    fn new(handler: SpecificCharacterHandler) -> Self {
         Self { handler }
     }
 

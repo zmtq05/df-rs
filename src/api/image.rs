@@ -6,14 +6,15 @@ use crate::{
     DfClient,
 };
 
-pub struct ImageHandler<'df> {
-    client: &'df DfClient,
+#[derive(Clone)]
+pub struct ImageHandler {
+    client: DfClient,
 }
 
 const BASE_URL: &str = "https://img-api.neople.co.kr/df";
 
-impl<'df> ImageHandler<'df> {
-    pub(crate) fn new(client: &'df DfClient) -> Self {
+impl ImageHandler {
+    pub(crate) fn new(client: DfClient) -> Self {
         Self { client }
     }
 

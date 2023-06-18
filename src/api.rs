@@ -12,8 +12,11 @@ macro_rules! unwrap_rows {
     }};
 }
 
+/// impl Serialize for query string
+///
+/// `field_a:value_a,field_b:value_b,...`
 macro_rules! nested_query {
-    ($target:ty; $($field:ident),*) => {
+    ($target:ty; $($field:ident),* $(,)?) => {
         impl serde::Serialize for $target {
             fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
                 use convert_case::{Case, Casing};

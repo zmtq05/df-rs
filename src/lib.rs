@@ -50,20 +50,20 @@ impl DfClient {
 }
 
 impl DfClient {
-    pub fn image(&self) -> ImageHandler<'_> {
-        ImageHandler::new(self)
+    pub fn image(&self) -> ImageHandler {
+        ImageHandler::new(self.clone())
     }
 
-    pub fn auction(&self) -> AuctionArtifacts<'_> {
-        AuctionArtifacts::new(self)
+    pub fn auction(&self) -> AuctionArtifacts {
+        AuctionArtifacts::new(self.clone())
     }
 
-    pub fn character(&self) -> CharacterHandler<'_> {
-        CharacterHandler::new(self)
+    pub fn character(&self) -> CharacterHandler {
+        CharacterHandler::new(self.clone())
     }
 
-    pub fn item(&self) -> ItemHandler<'_> {
-        ItemHandler::new(self)
+    pub fn item(&self) -> ItemHandler {
+        ItemHandler::new(self.clone())
     }
 }
 

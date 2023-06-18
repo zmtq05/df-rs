@@ -12,13 +12,13 @@ use crate::{
 use super::WordType;
 
 #[derive(Clone)]
-pub struct AuctionArtifacts<'df> {
-    client: &'df DfClient,
+pub struct AuctionArtifacts {
+    client: DfClient,
 
     param: Param,
 }
 
-impl<'df> AuctionArtifacts<'df> {
+impl AuctionArtifacts {
     fn make_url(&self, path: &str) -> String {
         let mut url = format!("{path}?");
 
@@ -55,8 +55,8 @@ impl<'df> AuctionArtifacts<'df> {
     }
 }
 
-impl<'df> AuctionArtifacts<'df> {
-    pub(crate) fn new(client: &'df DfClient) -> Self {
+impl AuctionArtifacts {
+    pub(crate) fn new(client: DfClient) -> Self {
         AuctionArtifacts {
             client,
             param: Default::default(),
@@ -183,13 +183,13 @@ impl<'df> AuctionArtifacts<'df> {
 #[derive(Default, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Param {
+    #[serde(skip)]
+    pub item_id: String,
+
     // NOTE:
     // `serde_urlencoded` serialize space to plus sign.
     // neople open api doesn't support plus sign.
     // so we need to add it manually by `urlencoding::encode`.
-    #[serde(skip)]
-    pub item_id: String,
-
     #[serde(skip)]
     pub item_name: String,
 
@@ -245,11 +245,9 @@ pub struct Query {
 
 nested_query!(
     Query;
-    min_level, max_level,
-    min_reinforce, max_reinforce,
-    min_refine, max_refine,
-    min_adventure_fame, max_adventure_fame,
-    rarity
+    rarity,
+    min_level, min_reinforce, min_refine, min_adventure_fame,
+    max_level, max_reinforce, max_refine, max_adventure_fame,
 );
 
 #[derive(Serialize)]

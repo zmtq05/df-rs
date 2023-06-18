@@ -8,14 +8,14 @@ use crate::{
 
 use super::WordType;
 
-pub struct ItemHandler<'df> {
-    client: &'df DfClient,
+pub struct ItemHandler {
+    client: DfClient,
 
     param: Option<Param>,
 }
 
-impl<'df> ItemHandler<'df> {
-    pub(crate) fn new(client: &'df DfClient) -> Self {
+impl ItemHandler {
+    pub(crate) fn new(client: DfClient) -> Self {
         Self {
             client,
             param: None,
@@ -23,7 +23,7 @@ impl<'df> ItemHandler<'df> {
     }
 }
 
-impl<'df> ItemHandler<'df> {
+impl ItemHandler {
     pub async fn search(&self, item_name: &str) -> Result<Vec<SearchItem>> {
         let resp = self
             .client
@@ -47,7 +47,7 @@ impl<'df> ItemHandler<'df> {
     }
 }
 
-impl<'df> ItemHandler<'df> {
+impl ItemHandler {
     fn param(&mut self) -> &mut Param {
         self.param.get_or_insert_with(Param::default)
     }
