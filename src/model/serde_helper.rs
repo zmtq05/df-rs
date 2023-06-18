@@ -1,5 +1,7 @@
 use serde::{de::Visitor, Deserialize, Deserializer};
 
+use crate::model::buff::BuffEnhance;
+
 use super::{
     character::Creature,
     item::{Item, ShopObtainInfo},
@@ -130,4 +132,44 @@ where
 
     let arr: Vec<Outer> = Deserialize::deserialize(deserializer)?;
     Ok(Some(arr.into_iter().flat_map(|row| row.rows).collect()))
+}
+
+/*
+before:
+{
+    "skill": {
+        "buff": { // BuffEnhance or null
+            "skillInfo": {
+                ...
+            },
+            "creature": {
+                ...
+            }
+        }
+    }
+}
+after:
+{
+    "buff": {
+        "skillInfo": {
+            ...
+        },
+        "creature": {
+            ...
+        }
+    }
+}
+*/
+
+pub fn flatten_buff_enhance<'de, D>(deserializer: D) -> Result<Option<BuffEnhance>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    struct Outer {
+        buff: Option<BuffEnhance>,
+    }
+
+    let outer: Outer = Deserialize::deserialize(deserializer)?;
+    Ok(outer.buff)
 }

@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_with::{serde_as, DefaultOnNull};
 
 use super::{
     item::{Item, ItemExt, ItemRarity, ItemWithRarity},
@@ -22,6 +23,7 @@ pub struct Character {
     pub job_grow: JobGrow,
 }
 
+#[serde_as]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterInfo {
@@ -38,9 +40,9 @@ pub struct CharacterInfo {
     #[serde(flatten)]
     pub job_grow: JobGrow,
 
-    #[serde(default)] // 오래된 캐릭터의 경우 null 일 수 있음
+    #[serde_as(deserialize_as = "DefaultOnNull")] // 오래된 캐릭터의 경우 null 일 수 있음
     pub adventure_name: String,
-
+    #[serde(flatten)]
     pub guild: Option<Guild>,
 }
 
@@ -76,6 +78,7 @@ macro_rules! decl_ty_extends_CharacterInfo {
             pub $field:ident: $field_type:ty,
         }
     ) => {
+        #[serde_with::serde_as]
         $(#[$attr])*
         pub struct $name {
             #[serde(rename = "characterId")]
@@ -86,15 +89,16 @@ macro_rules! decl_ty_extends_CharacterInfo {
             pub level: u8,
 
             #[serde(flatten)]
-            pub job: Job,
+            pub job: crate::model::character::Job,
 
             #[serde(flatten)]
-            pub job_grow: JobGrow,
+            pub job_grow: crate::model::character::JobGrow,
 
-            #[serde(default)] // 오래된 캐릭터의 경우 null 일 수 있음
+            #[serde_as(deserialize_as = "serde_with::DefaultOnNull")] // 오래된 캐릭터의 경우 null 일 수 있음
             pub adventure_name: String,
 
-            pub guild: Option<Guild>,
+            #[serde(flatten)]
+            pub guild: Option<crate::model::character::Guild>,
 
             $(#[$field_attr])*
             pub $field: $field_type,
@@ -104,6 +108,7 @@ macro_rules! decl_ty_extends_CharacterInfo {
 
 decl_ty_extends_CharacterInfo! {
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[serde(rename_all = "camelCase")]
     pub struct CharacterEquipments {
         #[serde(rename = "equipment")]
         pub equipments: Vec<Equipment>,
@@ -111,26 +116,31 @@ decl_ty_extends_CharacterInfo! {
 }
 decl_ty_extends_CharacterInfo! {
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[serde(rename_all = "camelCase")]
     pub struct CharacterAvatars {
         #[serde(rename = "avatar")]
-        pub avatars: Vec<Equipment>,
+        pub avatars: Vec<Avatar>,
     }
 }
 decl_ty_extends_CharacterInfo! {
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[serde(rename_all = "camelCase")]
     pub struct CharacterCreature {
-        pub creature: Creature,
+        pub creature: Option<Creature>,
     }
 }
 decl_ty_extends_CharacterInfo! {
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[serde(rename_all = "camelCase")]
     pub struct CharacterFlag {
-        pub flag: Flag,
+        pub flag: Option<Flag>,
     }
 }
 decl_ty_extends_CharacterInfo! {
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[serde(rename_all = "camelCase")]
     pub struct CharacterTalismans {
+        #[serde_as(deserialize_as = "DefaultOnNull")]
         pub talismans: Vec<Talisman>,
     }
 }
@@ -207,6 +217,7 @@ pub struct FusionOption {
 pub struct Avatar {
     #[serde(flatten)]
     pub slot: Slot,
+    #[serde(flatten)]
     pub item: ItemWithRarity,
     #[serde(deserialize_with = "serde_helper::opt_item", default)]
     pub clone: Option<Item>,
@@ -232,8 +243,9 @@ pub struct Emblem {
 pub struct Creature {
     #[serde(flatten)]
     pub item: ItemWithRarity,
-    pub clone: CreatureClone,
-    #[serde(rename = "artifact")]
+    #[serde(deserialize_with = "serde_helper::opt_item", default)]
+    pub clone: Option<Item>,
+    #[serde(rename = "artifact", default)]
     pub artifacts: Vec<Artifact>,
 }
 
@@ -281,6 +293,7 @@ pub struct Gem {
 // ------------------------------------
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Rune {
     pub slot_no: u8,
     #[serde(flatten)]
@@ -288,6 +301,7 @@ pub struct Rune {
 }
 
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Talisman {
     pub slot_no: u8,
     pub item: Item,
@@ -372,6 +386,15 @@ pub mod buff {
     use serde::{Deserialize, Serialize};
 
     use crate::model::serde_helper;
+
+    decl_ty_extends_CharacterInfo! {
+        #[derive(Debug, Clone, Deserialize, Serialize)]
+        #[serde(rename_all = "camelCase")]
+        pub struct CharacterBuffEnhance {
+            #[serde(rename(deserialize = "skill"), deserialize_with = "serde_helper::flatten_buff_enhance")]
+            pub buff: Option<BuffEnhance>,
+        }
+    }
 
     #[derive(Debug, Clone, Deserialize, Serialize)]
     #[serde(rename_all = "camelCase")]

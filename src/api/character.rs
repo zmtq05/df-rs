@@ -6,8 +6,8 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use crate::{
     model::{
-        buff::BuffEnhance, Character, CharacterAvatars, CharacterCreature, CharacterEquipments,
-        CharacterFlag, CharacterInfo, CharacterTalismans, Server,
+        buff::CharacterBuffEnhance, Character, CharacterAvatars, CharacterCreature,
+        CharacterEquipments, CharacterFlag, CharacterInfo, CharacterTalismans, Server,
     },
     DfClient, Result,
 };
@@ -230,31 +230,38 @@ impl SpecificCharacterBuffHandler {
         Self { handler }
     }
 
-    async fn get<T: DeserializeOwned>(&self, dst: &str) -> Result<T> {
+    async fn get(&self, dst: &str) -> Result<CharacterBuffEnhance> {
         self.handler.get(&format!("skill/buff/equip/{dst}")).await
     }
 
     /// [`BuffEnhance::avatars`] and [`BuffEnhance::creature`] are always `None`.
-    pub async fn equipments(&self) -> Result<BuffEnhance> {
+    pub async fn equipments(&self) -> Result<CharacterBuffEnhance> {
         self.get("equipment").await
     }
 
     /// [`BuffEnhance::equipments`] and [`BuffEnhance::creature`] are always `None`.
-    pub async fn avatars(&self) -> Result<BuffEnhance> {
+    pub async fn avatars(&self) -> Result<CharacterBuffEnhance> {
         self.get("avatar").await
     }
 
     /// [`BuffEnhance::equipments`] and [`BuffEnhance::avatars`] are always `None`.
-    pub async fn creature(&self) -> Result<BuffEnhance> {
+    pub async fn creature(&self) -> Result<CharacterBuffEnhance> {
         self.get("creature").await
     }
 
     /// Convenience method. using [`futures::join`].
-    pub async fn all(&self) -> Result<BuffEnhance> {
+    pub async fn all(&self) -> Result<CharacterBuffEnhance> {
         let (e, a, c) = join![self.equipments(), self.avatars(), self.creature()];
         let mut e = e?;
-        e.avatars = a?.avatars;
-        e.creature = c?.creature;
+        match &mut e.buff {
+            None => {
+                return Ok(e);
+            }
+            Some(buff) => {
+                buff.avatars = a?.buff.unwrap().avatars;
+                buff.creature = c?.buff.unwrap().creature;
+            }
+        }
         Ok(e)
     }
 }

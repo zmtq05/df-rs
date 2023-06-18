@@ -204,6 +204,7 @@ pub struct ShopObtainInfo {
     // ex) 모험단 상점, NPC 린지 로섬, ...
     pub name: String,
     // ex) ["105레벨 에픽 장비 선택 상자"]
+    #[serde(default)]
     pub details: Vec<String>,
 }
 
