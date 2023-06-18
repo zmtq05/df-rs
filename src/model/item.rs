@@ -155,8 +155,8 @@ pub struct ItemInfo {
     #[serde(flatten)]
     pub set: Option<Set>,
 
-    #[serde(rename = "itemStatus")]
-    pub status: super::character::Status,
+    #[serde(rename = "itemStatus", default)]
+    pub status: super::Status,
 
     pub grow_info: Option<GrowInfo>,
 
