@@ -26,7 +26,7 @@ pub fn instance() -> DfClient {
         .clone()
 }
 
-pub fn initialise(api_key: &str) -> DfClient {
+pub fn initialize(api_key: &str) -> DfClient {
     STATIC_INSTACE
         .get_or_init(|| DfClient::new(api_key))
         .clone()
