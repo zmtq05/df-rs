@@ -165,6 +165,12 @@ pub struct ItemInfo {
 
     #[serde(rename = "itemReinforceSkill")]
     pub reinforce_skill: Option<Vec<ReinforceSkill>>,
+
+    #[serde(default)]
+    pub talisman_info: Option<TalismanInfo>,
+
+    #[serde(default)]
+    pub rune_info: Option<RuneInfo>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -281,4 +287,21 @@ pub struct GrowOption {
 pub struct GrowOptionDefault {
     pub damage: i32,
     pub buff: i32,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TalismanInfo {
+    pub skill_id: String,
+    pub skill_name: String,
+    #[serde(flatten)]
+    pub explain: Explain,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RuneInfo {
+    pub skill_id: String,
+    pub skill_name: String,
+    pub rune_type: String,
 }
