@@ -45,7 +45,27 @@ pub enum WordType {
     Full,
 }
 
-pub mod auction;
+/// API Endpoints 2~14
+///
+/// ## Unimplemented
+/// - 04. timeline
+/// - 05. status
+/// - 11. skill style
 pub mod character;
-pub mod image;
+
+/// API Endpoints 15~17
+///
+/// ## Unimplemented
+/// - 16. lookup
+pub mod auction;
+
+/// API Endpoints 23~31
+///
+/// ## Unimplemented
+/// - 25. shop
+/// - 27. item hashtags
+/// - 28 ~ 31. set item
 pub mod item;
+
+/// Image API
+pub mod image;

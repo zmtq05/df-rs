@@ -19,6 +19,10 @@ const DF_BASE_URL: &str = "https://api.neople.co.kr/df";
 
 static STATIC_INSTACE: OnceLock<DfClient> = OnceLock::new();
 
+/// Get global instance.
+///
+/// # Panics
+/// Panics if global instance is not initialized.
 pub fn instance() -> DfClient {
     STATIC_INSTACE
         .get()
@@ -26,17 +30,20 @@ pub fn instance() -> DfClient {
         .clone()
 }
 
+/// Initializes global [`DfClient`] instance.
 pub fn initialize(api_key: &str) -> DfClient {
     STATIC_INSTACE
         .get_or_init(|| DfClient::new(api_key))
         .clone()
 }
 
+/// Client of [Dungeon & Fighter API](https://developers.neople.co.kr/contents/apiDocs/df).
 #[derive(Clone, Default)]
 pub struct DfClient {
     inner: reqwest::Client,
 }
 
+/// # Constructor
 impl DfClient {
     pub fn new(api_key: &str) -> Self {
         let mut headers = reqwest::header::HeaderMap::new();
@@ -49,21 +56,22 @@ impl DfClient {
     }
 }
 
+/// # Handlers
 impl DfClient {
-    pub fn image(&self) -> ImageHandler {
-        ImageHandler::new(self.clone())
-    }
-
-    pub fn auction(&self) -> AuctionHandler {
-        AuctionHandler::new(self.clone())
-    }
-
     pub fn character(&self) -> CharacterHandler {
         CharacterHandler::new(self.clone())
     }
 
     pub fn item(&self) -> ItemHandler {
         ItemHandler::new(self.clone())
+    }
+
+    pub fn auction(&self) -> AuctionHandler {
+        AuctionHandler::new(self.clone())
+    }
+
+    pub fn image(&self) -> ImageHandler {
+        ImageHandler::new(self.clone())
     }
 }
 

@@ -1,5 +1,3 @@
-//! TODO: UNTESTED
-
 use bytes::Bytes;
 use futures::join;
 use serde::{de::DeserializeOwned, Serialize};
@@ -22,6 +20,10 @@ pub struct CharacterHandler {
 }
 
 impl CharacterHandler {
+    /// Search characters by name.
+    ///
+    /// # Panics
+    /// Panics if [`CharacterHandler::name`] is not called.
     pub async fn search(&self) -> Result<Vec<Character>> {
         let param = self.search_param.as_ref().unwrap();
         let resp = self
@@ -40,12 +42,12 @@ impl CharacterHandler {
         Ok(characters)
     }
 
-    pub fn _of(&self, server: Server, character_id: &str) -> SpecificCharacterHandler {
-        SpecificCharacterHandler::new(self.client.clone(), server, character_id)
-    }
-
     pub fn of(&self, character: &Character) -> SpecificCharacterHandler {
         self._of(character.server, &character.id)
+    }
+
+    pub fn _of(&self, server: Server, character_id: &str) -> SpecificCharacterHandler {
+        SpecificCharacterHandler::new(self.client.clone(), server, character_id)
     }
 }
 
@@ -79,26 +81,32 @@ impl SpecificCharacterHandler {
         Ok(resp.json().await.unwrap())
     }
 
+    /// Get character information.
     pub async fn info(&self) -> Result<CharacterInfo> {
         self.get("").await
     }
 
+    /// Get character equipments.
     pub async fn equipments(&self) -> Result<CharacterEquipments> {
         self.get("equip/equipment").await
     }
 
+    /// Get character avatars.
     pub async fn avatars(&self) -> Result<CharacterAvatars> {
         self.get("equip/avatar").await
     }
 
+    /// Get character creature.
     pub async fn creature(&self) -> Result<CharacterCreature> {
         self.get("equip/creature").await
     }
 
+    /// Get character flag.
     pub async fn flag(&self) -> Result<CharacterFlag> {
         self.get("equip/flag").await
     }
 
+    /// Get character talismans.
     pub async fn talismans(&self) -> Result<CharacterTalismans> {
         self.get("equip/talisman").await
     }
@@ -107,6 +115,11 @@ impl SpecificCharacterHandler {
         SpecificCharacterBuffHandler::new(self.clone())
     }
 
+    /// Get character image.
+    ///
+    /// # Arguments
+    ///
+    /// * `zoom` - Zoom level. 1 to 3.
     pub async fn image(&self, zoom: u8) -> Result<Bytes> {
         self.client
             .image()
@@ -130,16 +143,25 @@ impl SpecificCharacterBuffHandler {
     }
 
     /// [`BuffEnhance::avatars`] and [`BuffEnhance::creature`] are always `None`.
+    ///
+    /// [`BuffEnhance::avatars`]: crate::model::buff::BuffEnhance#avatars
+    /// [`BuffEnhance::creature`]: crate::model::buff::BuffEnhance#creature
     pub async fn equipments(&self) -> Result<CharacterBuffEnhance> {
         self.get("equipment").await
     }
 
     /// [`BuffEnhance::equipments`] and [`BuffEnhance::creature`] are always `None`.
+    ///
+    /// [`BuffEnhance::equipments`]: crate::model::buff::BuffEnhance#equipments
+    /// [`BuffEnhance::creature`]: crate::model::buff::BuffEnhance#creature
     pub async fn avatars(&self) -> Result<CharacterBuffEnhance> {
         self.get("avatar").await
     }
 
     /// [`BuffEnhance::equipments`] and [`BuffEnhance::avatars`] are always `None`.
+    ///
+    /// [`BuffEnhance::equipments`]: crate::model::buff::BuffEnhance#equipments
+    /// [`BuffEnhance::avatars`]: crate::model::buff::BuffEnhance#avatars
     pub async fn creature(&self) -> Result<CharacterBuffEnhance> {
         self.get("creature").await
     }
