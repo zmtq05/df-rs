@@ -59,7 +59,8 @@ mod item {
 
     #[tokio::test]
     async fn search() {
-        let result = retry_if_limit_exceeded!(client().item().search("무색 큐브 조각").await);
+        let result =
+            retry_if_limit_exceeded!(client().item().name("무색 큐브 조각").search().await);
 
         // println!("{:#?}", result);
         assert!(result.is_ok());
@@ -70,7 +71,8 @@ mod item {
         let result = retry_if_limit_exceeded!(
             client()
                 .item()
-                .info("785e56a0ed4e3efd573da1f56a45217d")
+                .id("785e56a0ed4e3efd573da1f56a45217d")
+                .info()
                 .await
         );
 
