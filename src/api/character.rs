@@ -22,52 +22,6 @@ pub struct CharacterHandler {
 }
 
 impl CharacterHandler {
-    pub(crate) fn new(client: DfClient) -> Self {
-        Self {
-            client,
-            search_param: None,
-        }
-    }
-
-    fn param_mut(&mut self) -> &mut CharacterSearchParameter {
-        self.search_param.get_or_insert_with(Default::default)
-    }
-
-    pub fn param(mut self, param: CharacterSearchParameter) -> Self {
-        self.search_param = Some(param);
-        self
-    }
-
-    pub fn name(mut self, character_name: impl Into<String>) -> Self {
-        self.param_mut().name(character_name);
-        self
-    }
-
-    pub fn server(mut self, server: Server) -> Self {
-        self.param_mut().server(server);
-        self
-    }
-
-    pub fn job_id(mut self, job_id: impl Into<String>) -> Self {
-        self.param_mut().job_id(job_id);
-        self
-    }
-
-    pub fn job_grow_id(mut self, job_grow_id: impl Into<String>) -> Self {
-        self.param_mut().job_grow_id(job_grow_id);
-        self
-    }
-
-    pub fn limit(mut self, limit: u8) -> Self {
-        self.param_mut().limit(limit);
-        self
-    }
-
-    pub fn word_type(mut self, word_type: WordType) -> Self {
-        self.param_mut().word_type(word_type);
-        self
-    }
-
     pub async fn search(&self) -> Result<Vec<Character>> {
         let param = self.search_param.as_ref().unwrap();
         let resp = self
@@ -92,65 +46,6 @@ impl CharacterHandler {
 
     pub fn of(&self, character: &Character) -> SpecificCharacterHandler {
         self._of(character.server, &character.id)
-    }
-}
-
-#[derive(Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CharacterSearchParameter {
-    #[serde(skip)]
-    server: Server,
-    #[serde(skip)]
-    name: Option<String>,
-
-    job_id: Option<String>,
-    job_grow_id: Option<String>,
-    word_type: Option<WordType>,
-    limit: Option<u8>,
-}
-
-impl Default for CharacterSearchParameter {
-    fn default() -> Self {
-        Self {
-            server: Server::All,
-            name: Default::default(),
-            job_id: Default::default(),
-            job_grow_id: Default::default(),
-            word_type: Default::default(),
-            limit: Default::default(),
-        }
-    }
-}
-
-impl CharacterSearchParameter {
-    pub fn server(&mut self, server: Server) -> &mut Self {
-        self.server = server;
-        self
-    }
-
-    pub fn job_id(&mut self, job_id: impl Into<String>) -> &mut Self {
-        self.job_id = Some(job_id.into());
-        self
-    }
-
-    pub fn job_grow_id(&mut self, job_grow_id: impl Into<String>) -> &mut Self {
-        self.job_grow_id = Some(job_grow_id.into());
-        self
-    }
-
-    pub fn word_type(&mut self, word_type: WordType) -> &mut Self {
-        self.word_type = Some(word_type);
-        self
-    }
-
-    pub fn limit(&mut self, limit: u8) -> &mut Self {
-        self.limit = Some(limit);
-        self
-    }
-
-    fn name(&mut self, name: impl Into<String>) -> &mut Self {
-        self.name = Some(name.into());
-        self
     }
 }
 
@@ -263,5 +158,75 @@ impl SpecificCharacterBuffHandler {
             }
         }
         Ok(e)
+    }
+}
+
+impl CharacterHandler {
+    pub(crate) fn new(client: DfClient) -> Self {
+        Self {
+            client,
+            search_param: None,
+        }
+    }
+
+    fn param_mut(&mut self) -> &mut CharacterSearchParameter {
+        self.search_param.get_or_insert_with(Default::default)
+    }
+
+    pub fn name(mut self, character_name: impl Into<String>) -> Self {
+        self.param_mut().name = Some(character_name.into());
+        self
+    }
+
+    pub fn server(mut self, server: Server) -> Self {
+        self.param_mut().server = server;
+        self
+    }
+
+    pub fn job_id(mut self, job_id: impl Into<String>) -> Self {
+        self.param_mut().job_id = Some(job_id.into());
+        self
+    }
+
+    pub fn job_grow_id(mut self, job_grow_id: impl Into<String>) -> Self {
+        self.param_mut().job_grow_id = Some(job_grow_id.into());
+        self
+    }
+
+    pub fn limit(mut self, limit: u8) -> Self {
+        self.param_mut().limit = Some(limit);
+        self
+    }
+
+    pub fn word_type(mut self, word_type: WordType) -> Self {
+        self.param_mut().word_type = Some(word_type);
+        self
+    }
+}
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CharacterSearchParameter {
+    #[serde(skip)]
+    server: Server,
+    #[serde(skip)]
+    name: Option<String>,
+
+    job_id: Option<String>,
+    job_grow_id: Option<String>,
+    word_type: Option<WordType>,
+    limit: Option<u8>,
+}
+
+impl Default for CharacterSearchParameter {
+    fn default() -> Self {
+        Self {
+            server: Server::All,
+            name: Default::default(),
+            job_id: Default::default(),
+            job_grow_id: Default::default(),
+            word_type: Default::default(),
+            limit: Default::default(),
+        }
     }
 }

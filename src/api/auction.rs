@@ -19,22 +19,6 @@ pub struct AuctionArtifacts {
 }
 
 impl AuctionArtifacts {
-    fn make_url(&self, path: &str) -> String {
-        let mut url = format!("{path}?");
-
-        let name = &self.param.item_name;
-        let id = &self.param.item_id;
-
-        if !name.is_empty() {
-            url.push_str(&format!("itemName={}", encode(name)));
-        } else if !id.is_empty() {
-            url.push_str(&format!("itemId={}", id));
-        } else {
-            panic!("item_id or item_name must be set");
-        }
-        url
-    }
-
     pub async fn search(&self) -> Result<Vec<AuctionInfo>> {
         let url = self.make_url("/auction");
 
@@ -52,6 +36,22 @@ impl AuctionArtifacts {
             .await?;
 
         Ok(unwrap_rows!(resp, SoldAuctionInfo))
+    }
+
+    fn make_url(&self, path: &str) -> String {
+        let mut url = format!("{path}?");
+
+        let name = &self.param.item_name;
+        let id = &self.param.item_id;
+
+        if !name.is_empty() {
+            url.push_str(&format!("itemName={}", encode(name)));
+        } else if !id.is_empty() {
+            url.push_str(&format!("itemId={}", id));
+        } else {
+            panic!("item_id or item_name must be set");
+        }
+        url
     }
 }
 
@@ -93,12 +93,12 @@ impl AuctionArtifacts {
         self
     }
 
-    pub fn item_id(&mut self, item_id: impl Into<String>) -> &mut Self {
+    pub fn id(&mut self, item_id: impl Into<String>) -> &mut Self {
         self.param.item_id = item_id.into();
         self
     }
 
-    pub fn item_name(&mut self, item_name: impl Into<String>) -> &mut Self {
+    pub fn name(&mut self, item_name: impl Into<String>) -> &mut Self {
         self.param.item_name = item_name.into();
         self
     }

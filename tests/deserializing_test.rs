@@ -32,13 +32,8 @@ mod auction {
 
     #[tokio::test]
     async fn search() {
-        let result = retry_if_limit_exceeded!(
-            client()
-                .auction()
-                .item_name("무색 큐브 조각")
-                .search()
-                .await
-        );
+        let result =
+            retry_if_limit_exceeded!(client().auction().name("무색 큐브 조각").search().await);
 
         // println!("{:#?}", result);
         assert!(result.is_ok());
@@ -47,7 +42,7 @@ mod auction {
     #[tokio::test]
     async fn sold() {
         let result =
-            retry_if_limit_exceeded!(client().auction().item_name("무색 큐브 조각").sold().await);
+            retry_if_limit_exceeded!(client().auction().name("무색 큐브 조각").sold().await);
 
         // println!("{:#?}", result);
         assert!(result.is_ok());
