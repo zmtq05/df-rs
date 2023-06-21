@@ -12,13 +12,13 @@ use crate::{
 use super::WordType;
 
 #[derive(Clone)]
-pub struct AuctionArtifacts {
+pub struct AuctionHandler {
     client: DfClient,
 
     param: Param,
 }
 
-impl AuctionArtifacts {
+impl AuctionHandler {
     pub async fn search(&self) -> Result<Vec<AuctionInfo>> {
         let url = self.make_url("/auction");
 
@@ -55,9 +55,9 @@ impl AuctionArtifacts {
     }
 }
 
-impl AuctionArtifacts {
+impl AuctionHandler {
     pub(crate) fn new(client: DfClient) -> Self {
-        AuctionArtifacts {
+        AuctionHandler {
             client,
             param: Default::default(),
         }

@@ -9,7 +9,7 @@ pub mod util;
 use std::sync::OnceLock;
 
 use api::{
-    auction::AuctionArtifacts, character::CharacterHandler, image::ImageHandler, item::ItemHandler,
+    auction::AuctionHandler, character::CharacterHandler, image::ImageHandler, item::ItemHandler,
 };
 use reqwest::Response;
 
@@ -54,8 +54,8 @@ impl DfClient {
         ImageHandler::new(self.clone())
     }
 
-    pub fn auction(&self) -> AuctionArtifacts {
-        AuctionArtifacts::new(self.clone())
+    pub fn auction(&self) -> AuctionHandler {
+        AuctionHandler::new(self.clone())
     }
 
     pub fn character(&self) -> CharacterHandler {
