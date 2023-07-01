@@ -144,6 +144,14 @@ decl_ty_extends_CharacterInfo! {
         pub talismans: Vec<Talisman>,
     }
 }
+decl_ty_extends_CharacterInfo! {
+    #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[serde(rename_all = "camelCase")]
+    pub struct CharacterTimeline {
+        pub timeline: Option<Timeline>,
+    }
+}
+
 // ------------------------------------
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -380,6 +388,38 @@ pub struct Skill {
 pub enum SkillCostType {
     SP,
     TP,
+}
+
+// ------------------------------------
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TimelineDate {
+    pub end: String,
+    pub start: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct TimelineRowData {
+    pub channel_name: String,
+    pub channel_no: u8,
+    pub item_id: String,
+    pub item_name: String,
+    pub item_rarity: String,
+    pub reinforce: u8,
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TimelineRow {
+    pub code: i64,
+    pub data: TimelineRowData,
+    pub date: String,
+    pub name: String,
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Timeline {
+    pub date: TimelineDate,
+    pub next: Option<String>,
+    pub rows: Vec<TimelineRow>,
 }
 
 pub mod buff {
