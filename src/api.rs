@@ -12,7 +12,8 @@ macro_rules! unwrap_rows {
     }};
 }
 
-/// impl Serialize for query string
+/// impl Serialize for nested query
+/// fields are renamed to camelCase
 ///
 /// `field_a:value_a,field_b:value_b,...`
 macro_rules! nested_query {

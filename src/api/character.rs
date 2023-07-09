@@ -2,6 +2,7 @@ use bytes::Bytes;
 use futures::join;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use time::PrimitiveDateTime;
+use urlencoding::encode;
 
 use crate::{
     model::{
@@ -17,24 +18,34 @@ use super::WordType;
 #[derive(Clone)]
 pub struct CharacterHandler {
     client: DfClient,
-
-    search_param: Option<CharacterSearchParameter>,
+    param: CharacterSearchParameter,
 }
 
+/// # Constructor
+impl CharacterHandler {
+    pub(crate) fn new(client: DfClient) -> Self {
+        Self {
+            client,
+            param: Default::default(),
+        }
+    }
+}
+
+/// # Send Request
 impl CharacterHandler {
     /// Search characters by name.
     ///
     /// # Panics
     /// Panics if [`CharacterHandler::name`] is not called.
     pub async fn search(&self) -> Result<Vec<Character>> {
-        let param = self.search_param.as_ref().unwrap();
+        let param = &self.param;
         let resp = self
             .client
             .get_with_query(
                 &format!(
                     "/servers/{server}/characters?characterName={name}",
                     server = param.server,
-                    name = param.name.as_ref().expect("must be call `name()`"),
+                    name = encode(&param.name),
                 ),
                 Some(param),
             )
@@ -43,7 +54,56 @@ impl CharacterHandler {
         let characters = unwrap_rows!(resp, Character);
         Ok(characters)
     }
+}
 
+/// # Parameter
+impl CharacterHandler {
+    pub fn name(&mut self, character_name: impl Into<String>) -> &mut Self {
+        self.param.name = character_name.into();
+        self
+    }
+
+    pub fn server(&mut self, server: Server) -> &mut Self {
+        self.param.server = server;
+        self
+    }
+
+    pub fn job_id(&mut self, job_id: impl Into<String>) -> &mut Self {
+        self.param.job_id = Some(job_id.into());
+        self
+    }
+
+    pub fn job_grow_id(&mut self, job_grow_id: impl Into<String>) -> &mut Self {
+        self.param.job_grow_id = Some(job_grow_id.into());
+        self
+    }
+
+    pub fn limit(&mut self, limit: u8) -> &mut Self {
+        self.param.limit = Some(limit);
+        self
+    }
+
+    pub fn word_type(&mut self, word_type: WordType) -> &mut Self {
+        self.param.word_type = Some(word_type);
+        self
+    }
+}
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CharacterSearchParameter {
+    #[serde(skip)]
+    pub server: Server,
+    #[serde(skip)]
+    pub name: String,
+    pub job_id: Option<String>,
+    pub job_grow_id: Option<String>,
+    pub word_type: Option<WordType>,
+    pub limit: Option<u8>,
+}
+
+/// # Constructor of [`SpecificCharacterHandler`]
+impl CharacterHandler {
     pub fn of(&self, character: &Character) -> SpecificCharacterHandler {
         self._of(character.server, &character.id)
     }
@@ -56,8 +116,8 @@ impl CharacterHandler {
 #[derive(Clone)]
 pub struct SpecificCharacterHandler {
     client: DfClient,
-    server: Server,
-    character_id: String,
+    pub server: Server,
+    pub character_id: String,
 }
 
 impl SpecificCharacterHandler {
@@ -69,11 +129,18 @@ impl SpecificCharacterHandler {
         }
     }
 
+    pub fn buff(&self) -> SpecificCharacterBuffHandler {
+        SpecificCharacterBuffHandler::new(self.clone())
+    }
+}
+
+/// # Send Request
+impl SpecificCharacterHandler {
     async fn get<T: DeserializeOwned>(&self, dst: &str) -> Result<T> {
         let resp = self
             .client
             .get(&format!(
-                "/servers/{server}/characters/{id}/{dst}",
+                "/servers/{server}/characters/{id}/{dst}", // trailing slash is allowed
                 server = self.server,
                 id = self.character_id,
                 dst = dst,
@@ -127,10 +194,6 @@ impl SpecificCharacterHandler {
     /// Get character talismans.
     pub async fn talismans(&self) -> Result<CharacterTalismans> {
         self.get("equip/talisman").await
-    }
-
-    pub fn buff(&self) -> SpecificCharacterBuffHandler {
-        SpecificCharacterBuffHandler::new(self.clone())
     }
 
     /// Get character image.
@@ -199,63 +262,6 @@ impl SpecificCharacterBuffHandler {
         }
         Ok(e)
     }
-}
-
-impl CharacterHandler {
-    pub(crate) fn new(client: DfClient) -> Self {
-        Self {
-            client,
-            search_param: None,
-        }
-    }
-
-    fn param_mut(&mut self) -> &mut CharacterSearchParameter {
-        self.search_param.get_or_insert_with(Default::default)
-    }
-
-    pub fn name(mut self, character_name: impl Into<String>) -> Self {
-        self.param_mut().name = Some(character_name.into());
-        self
-    }
-
-    pub fn server(mut self, server: Server) -> Self {
-        self.param_mut().server = server;
-        self
-    }
-
-    pub fn job_id(mut self, job_id: impl Into<String>) -> Self {
-        self.param_mut().job_id = Some(job_id.into());
-        self
-    }
-
-    pub fn job_grow_id(mut self, job_grow_id: impl Into<String>) -> Self {
-        self.param_mut().job_grow_id = Some(job_grow_id.into());
-        self
-    }
-
-    pub fn limit(mut self, limit: u8) -> Self {
-        self.param_mut().limit = Some(limit);
-        self
-    }
-
-    pub fn word_type(mut self, word_type: WordType) -> Self {
-        self.param_mut().word_type = Some(word_type);
-        self
-    }
-}
-
-#[derive(Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CharacterSearchParameter {
-    #[serde(skip)]
-    server: Server,
-    #[serde(skip)]
-    name: Option<String>,
-
-    job_id: Option<String>,
-    job_grow_id: Option<String>,
-    word_type: Option<WordType>,
-    limit: Option<u8>,
 }
 
 impl Default for CharacterSearchParameter {

@@ -14,10 +14,20 @@ use super::WordType;
 #[derive(Clone)]
 pub struct AuctionHandler {
     client: DfClient,
-
-    param: Param,
+    param: AuctionSearchParameter,
 }
 
+/// # Constructor
+impl AuctionHandler {
+    pub(crate) fn new(client: DfClient) -> Self {
+        AuctionHandler {
+            client,
+            param: Default::default(),
+        }
+    }
+}
+
+/// # Send Request
 impl AuctionHandler {
     pub async fn search(&self) -> Result<Vec<AuctionInfo>> {
         let url = self.make_url("/auction");
@@ -55,15 +65,9 @@ impl AuctionHandler {
     }
 }
 
+/// # Parameter
 impl AuctionHandler {
-    pub(crate) fn new(client: DfClient) -> Self {
-        AuctionHandler {
-            client,
-            param: Default::default(),
-        }
-    }
-
-    pub fn param(&mut self, param: Param) -> &mut Self {
+    pub fn param(&mut self, param: AuctionSearchParameter) -> &mut Self {
         self.param = param;
         self
     }
@@ -182,30 +186,24 @@ impl AuctionHandler {
 
 #[derive(Default, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Param {
-    #[serde(skip)]
-    pub item_id: String,
-
+pub struct AuctionSearchParameter {
     // NOTE:
     // `serde_urlencoded` serialize space to plus sign.
     // neople open api doesn't support plus sign.
     // so we need to add it manually by `urlencoding::encode`.
     #[serde(skip)]
     pub item_name: String,
-
+    #[serde(skip)]
+    pub item_id: String,
     pub limit: Option<u16>,
-
     pub sort: Sort,
-
     pub word_type: Option<WordType>,
-
     pub word_short: Option<bool>,
-
     #[serde(rename = "q")]
     pub query: Query,
 }
 
-impl Param {
+impl AuctionSearchParameter {
     fn to_sold_param(&self) -> SoldAuctionParam {
         SoldAuctionParam {
             limit: self.limit,
