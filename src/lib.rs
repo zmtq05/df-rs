@@ -100,5 +100,5 @@ async fn map_api_error(response: Response) -> Result<Response> {
         return Ok(response);
     }
 
-    Err(Error::Api(ApiError::from_response(response).await))
+    Err(Error::Response(ApiError::from_response(response).await))
 }

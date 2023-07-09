@@ -1,6 +1,7 @@
 use bytes::Bytes;
 
 use crate::{
+    error::InvalidQueryParameter,
     model::{Character, Server},
     util::AsItem,
     DfClient,
@@ -24,11 +25,18 @@ impl ImageHandler {
         character_id: &str,
         zoom: u8,
     ) -> crate::Result<Bytes> {
+        let url = format!("{BASE_URL}/servers/{server}/characters/{character_id}");
+        if !(1..=3).contains(&zoom) {
+            return Err(InvalidQueryParameter {
+                path: url.clone(),
+                message: format!("`zoom` must be 1, 2, or 3. (current: `{zoom}`)"),
+            }
+            .into());
+        }
+
         let response = self
             .client
-            .get(&format!(
-                "{BASE_URL}/servers/{server}/characters/{character_id}?zoom={zoom}"
-            ))
+            .get_with_query(&url, Some(&[("zoom", zoom)]))
             .await?;
 
         Ok(response.bytes().await?)

@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use reqwest::Response;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -9,13 +7,23 @@ pub enum Error {
     #[error("{0}")]
     Reqwest(#[from] reqwest::Error),
     #[error("{0}")]
-    Api(#[from] ApiError),
+    Response(#[from] ApiError),
+    #[error("{0}")]
+    InvalidQueryParameter(#[from] InvalidQueryParameter),
 }
 
 #[derive(Debug, Error, Clone, Deserialize)]
+#[error("status: {status}, code: {code}, message: {message}")]
 pub struct ApiError {
     pub status: u16,
     pub code: ErrorCode,
+    pub message: String,
+}
+
+#[derive(Debug, Error, Clone)]
+#[error("Invalid parameter: {message} (/df/{path})")]
+pub struct InvalidQueryParameter {
+    pub path: String,
     pub message: String,
 }
 
@@ -29,13 +37,6 @@ impl ApiError {
         // origin: { "error": { "status": 404, ... } }
 
         response.json::<OuterError>().await.unwrap().error
-    }
-}
-
-impl Display for ApiError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        // TODO: better formatting
-        write!(f, "{self:?}")
     }
 }
 

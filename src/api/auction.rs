@@ -5,6 +5,7 @@ use serde_with::SerializeDisplay;
 use urlencoding::encode;
 
 use crate::{
+    error::InvalidQueryParameter,
     model::{AuctionInfo, ItemRarity, SoldAuctionInfo},
     DfClient, Result,
 };
@@ -30,7 +31,7 @@ impl AuctionHandler {
 /// # Send Request
 impl AuctionHandler {
     pub async fn search(&self) -> Result<Vec<AuctionInfo>> {
-        let url = self.make_url("/auction");
+        let url = self.make_url("/auction")?;
 
         let resp = self.client.get_with_query(&url, Some(&self.param)).await?;
 
@@ -38,7 +39,7 @@ impl AuctionHandler {
     }
 
     pub async fn sold(&self) -> Result<Vec<SoldAuctionInfo>> {
-        let url = self.make_url("/auction-sold");
+        let url = self.make_url("/auction-sold")?;
 
         let resp = self
             .client
@@ -48,7 +49,7 @@ impl AuctionHandler {
         Ok(unwrap_rows!(resp, SoldAuctionInfo))
     }
 
-    fn make_url(&self, path: &str) -> String {
+    fn make_url(&self, path: &str) -> Result<String> {
         let mut url = format!("{path}?");
 
         let name = &self.param.item_name;
@@ -59,9 +60,13 @@ impl AuctionHandler {
         } else if !id.is_empty() {
             url.push_str(&format!("itemId={}", id));
         } else {
-            panic!("item_id or item_name must be set");
+            return Err(InvalidQueryParameter {
+                path: url.clone(),
+                message: "`item_name` or `item_id` must be specified.".to_owned(),
+            }
+            .into());
         }
-        url
+        Ok(url)
     }
 }
 

@@ -6,6 +6,7 @@ use serde::Serialize;
 use urlencoding::encode;
 
 use crate::{
+    error::InvalidQueryParameter,
     model::{ItemInfo, ItemRarity, SearchItem},
     DfClient, Result,
 };
@@ -31,13 +32,18 @@ impl ItemHandler {
 /// # Send Request
 impl ItemHandler {
     pub async fn search(&self) -> Result<Vec<SearchItem>> {
+        let name = &self.param.item_name;
+        if name.is_empty() {
+            return Err(InvalidQueryParameter {
+                path: "/items".to_owned(),
+                message: "`itemName` must be specified.".to_owned(),
+            }
+            .into());
+        }
         let resp = self
             .client
             .get_with_query(
-                &format!(
-                    "/items?itemName={name}",
-                    name = encode(&self.param.item_name)
-                ),
+                &format!("/items?itemName={name}", name = encode(name)),
                 Some(&self.param),
             )
             .await?;
@@ -55,19 +61,24 @@ impl ItemHandler {
     }
 
     pub async fn multi_info(&self) -> Result<Vec<ItemInfo>> {
+        let id = &self.param.item_id;
+        if id.is_empty() {
+            return Err(InvalidQueryParameter {
+                path: "/multi/items".to_owned(),
+                message: "`itemIds` must be specified. (use `id_iter()`)".to_owned(),
+            }
+            .into());
+        }
         let resp = self
             .client
-            .get(&format!(
-                "/multi/items?itemIds={id}",
-                id = self.param.item_id
-            ))
+            .get(&format!("/multi/items?itemIds={id}"))
             .await?;
 
         Ok(unwrap_rows!(resp, ItemInfo))
     }
 
-    pub async fn image(&self, item_id: &str) -> Result<Bytes> {
-        self.client.image()._item(item_id).await
+    pub async fn image(&self) -> Result<Bytes> {
+        self.client.image()._item(&self.param.item_id).await
     }
 }
 

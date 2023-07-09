@@ -5,6 +5,7 @@ use time::PrimitiveDateTime;
 use urlencoding::encode;
 
 use crate::{
+    error::InvalidQueryParameter,
     model::{
         buff::CharacterBuffEnhance, Character, CharacterAvatars, CharacterCreature,
         CharacterEquipments, CharacterFlag, CharacterInfo, CharacterTalismans, CharacterTimeline,
@@ -34,18 +35,23 @@ impl CharacterHandler {
 /// # Send Request
 impl CharacterHandler {
     /// Search characters by name.
-    ///
-    /// # Panics
-    /// Panics if [`CharacterHandler::name`] is not called.
     pub async fn search(&self) -> Result<Vec<Character>> {
+        let name = &self.param.name;
+        let server = self.param.server;
+        if name.is_empty() {
+            return Err(InvalidQueryParameter {
+                path: format!("/servers/{server}/characters"),
+                message: "`characterName` must be specified.".to_owned(),
+            }
+            .into());
+        }
         let param = &self.param;
         let resp = self
             .client
             .get_with_query(
                 &format!(
                     "/servers/{server}/characters?characterName={name}",
-                    server = param.server,
-                    name = encode(&param.name),
+                    name = encode(name),
                 ),
                 Some(param),
             )
