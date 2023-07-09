@@ -13,9 +13,10 @@ futures = "0.3"
 itertools = "0.10.5"
 reqwest = { version = "0.11", features = ["json"] }
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+serde_json = { version = "1", features = ["preserve_order"] }
 serde_with = "3"
 thiserror = "1"
+time = { version = "0.3.23", features = ["macros", "serde-human-readable"] }
 urlencoding = "2.1.2"
 
 [dev-dependencies]

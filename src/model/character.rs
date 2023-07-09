@@ -399,21 +399,11 @@ pub struct TimelineDate {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct TimelineRowData {
-    pub channel_name: String,
-    pub channel_no: u8,
-    pub item_id: String,
-    pub item_name: String,
-    pub item_rarity: String,
-    pub reinforce: u8,
-}
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TimelineRow {
     pub code: i64,
-    pub data: TimelineRowData,
-    pub date: String,
     pub name: String,
+    pub date: String,
+    pub data: serde_json::Map<String, serde_json::Value>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Timeline {

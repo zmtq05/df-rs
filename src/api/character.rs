@@ -1,11 +1,13 @@
 use bytes::Bytes;
 use futures::join;
-use serde::{de::DeserializeOwned, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use time::PrimitiveDateTime;
 
 use crate::{
     model::{
         buff::CharacterBuffEnhance, Character, CharacterAvatars, CharacterCreature,
-        CharacterEquipments, CharacterFlag, CharacterInfo, CharacterTalismans, Server,
+        CharacterEquipments, CharacterFlag, CharacterInfo, CharacterTalismans, CharacterTimeline,
+        Server,
     },
     DfClient, Result,
 };
@@ -84,6 +86,22 @@ impl SpecificCharacterHandler {
     /// Get character information.
     pub async fn info(&self) -> Result<CharacterInfo> {
         self.get("").await
+    }
+
+    pub async fn timeline(&self, param: Option<&TimelineParameter>) -> Result<CharacterTimeline> {
+        let resp = self
+            .client
+            .get_with_query(
+                &format!(
+                    "/servers/{server}/characters/{id}/timeline",
+                    server = self.server,
+                    id = self.character_id,
+                ),
+                param,
+            )
+            .await?;
+
+        Ok(resp.json().await.unwrap())
     }
 
     /// Get character equipments.
@@ -252,3 +270,21 @@ impl Default for CharacterSearchParameter {
         }
     }
 }
+
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TimelineParameter {
+    #[serde(with = "timeline_format::option")]
+    pub start_date: Option<PrimitiveDateTime>,
+    #[serde(with = "timeline_format::option")]
+    pub end_date: Option<PrimitiveDateTime>,
+    pub limit: Option<u8>,
+    pub code: Option<String>,
+    pub next: Option<String>,
+}
+
+time::serde::format_description!(
+    timeline_format,
+    PrimitiveDateTime,
+    "[year]-[month]-[day] [hour]:[minute]"
+);

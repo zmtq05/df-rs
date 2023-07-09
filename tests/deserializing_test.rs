@@ -113,6 +113,28 @@ mod character {
     }
 
     #[tokio::test]
+    async fn timeline() {
+        let client = client();
+        let mut characters = client
+            .character()
+            .name("PostScript")
+            .server(df_rs::model::Server::Casillas)
+            .search()
+            .await
+            .unwrap();
+        let character = characters.pop().unwrap();
+
+        let timeline = client
+            .character()
+            .of(&character)
+            .timeline(None)
+            .await
+            .unwrap();
+
+        println!("{:#?}", timeline);
+    }
+
+    #[tokio::test]
     async fn equipments() {
         let client = client();
         let characters = get_characters().await.unwrap();
