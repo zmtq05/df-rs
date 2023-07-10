@@ -17,6 +17,7 @@ serde_json = { version = "1", features = ["preserve_order"] }
 serde_with = "3"
 thiserror = "1"
 time = { version = "0.3.23", features = ["macros", "serde-human-readable"] }
+tracing = "0.1.37"
 urlencoding = "2.1.2"
 
 [dev-dependencies]

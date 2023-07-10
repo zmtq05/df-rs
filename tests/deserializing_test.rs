@@ -1,7 +1,7 @@
 use std::env;
 
 use df_rs::{
-    error::{ApiError, ErrorCode},
+    error::{ErrorCode, ResponseError},
     Error,
 };
 
@@ -11,7 +11,7 @@ fn client() -> df_rs::DfClient {
 
 fn is_limit_exceeded<T>(result: &Result<T, Error>) -> bool {
     match result {
-        Err(Error::Response(ApiError { code, .. })) => *code == ErrorCode::API002,
+        Err(Error::Response(ResponseError { code, .. })) => *code == ErrorCode::API002,
         _ => false,
     }
 }

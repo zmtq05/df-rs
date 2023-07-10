@@ -109,15 +109,21 @@ impl ItemHandler {
         self
     }
     pub fn max_level(&mut self, max_level: u8) -> &mut Self {
-        self.param.query.max_level = Some(max_level);
+        self.param
+            .query
+            .get_or_insert_with(Default::default)
+            .max_level = Some(max_level);
         self
     }
     pub fn min_level(&mut self, min_level: u8) -> &mut Self {
-        self.param.query.min_level = Some(min_level);
+        self.param
+            .query
+            .get_or_insert_with(Default::default)
+            .min_level = Some(min_level);
         self
     }
     pub fn rarity(&mut self, rarity: ItemRarity) -> &mut Self {
-        self.param.query.rarity = Some(rarity);
+        self.param.query.get_or_insert_with(Default::default).rarity = Some(rarity);
         self
     }
 }
@@ -132,7 +138,7 @@ pub struct ItemSearchParameter {
     pub limit: Option<u8>,
     pub word_type: Option<WordType>,
     #[serde(rename = "q")]
-    pub query: Query,
+    pub query: Option<Query>,
 }
 
 #[derive(Default, Clone)]

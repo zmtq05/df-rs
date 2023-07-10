@@ -1,8 +1,9 @@
 pub mod api;
 pub mod error;
-use error::ApiError;
 pub use error::Error;
+use error::ResponseError;
 use serde::Serialize;
+use tracing::{error, info};
 pub mod model;
 pub mod util;
 
@@ -89,7 +90,10 @@ impl DfClient {
         } else {
             format!("{}{}", DF_BASE_URL, url)
         };
-        let response = self.inner.get(url).query(&query).send().await?;
+        let request = self.inner.get(url).query(&query).build()?;
+        info!("Request: {}", request.url());
+
+        let response = self.inner.execute(request).await?;
 
         map_api_error(response).await
     }
@@ -100,5 +104,7 @@ async fn map_api_error(response: Response) -> Result<Response> {
         return Ok(response);
     }
 
-    Err(Error::Response(ApiError::from_response(response).await))
+    let err = ResponseError::from_response(response).await;
+    error!("Response error: {}", err);
+    Err(err.into())
 }

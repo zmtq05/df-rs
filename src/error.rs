@@ -7,14 +7,14 @@ pub enum Error {
     #[error("{0}")]
     Reqwest(#[from] reqwest::Error),
     #[error("{0}")]
-    Response(#[from] ApiError),
+    Response(#[from] ResponseError),
     #[error("{0}")]
     InvalidQueryParameter(#[from] InvalidQueryParameter),
 }
 
 #[derive(Debug, Error, Clone, Deserialize)]
 #[error("status: {status}, code: {code}, message: {message}")]
-pub struct ApiError {
+pub struct ResponseError {
     pub status: u16,
     pub code: ErrorCode,
     pub message: String,
@@ -27,11 +27,11 @@ pub struct InvalidQueryParameter {
     pub message: String,
 }
 
-impl ApiError {
+impl ResponseError {
     pub(crate) async fn from_response(response: Response) -> Self {
         #[derive(Deserialize)]
         struct OuterError {
-            error: ApiError,
+            error: ResponseError,
         }
 
         // origin: { "error": { "status": 404, ... } }

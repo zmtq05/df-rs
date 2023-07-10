@@ -83,22 +83,31 @@ impl AuctionHandler {
     }
 
     pub fn sort(&mut self, sort: Sort) -> &mut Self {
-        self.param.sort = sort;
+        self.param.sort = Some(sort);
         self
     }
 
     pub fn sort_by_reinforce(&mut self, sort: SortOrder) -> &mut Self {
-        self.param.sort.reinforce = Some(sort);
+        self.param
+            .sort
+            .get_or_insert_with(Default::default)
+            .reinforce = Some(sort);
         self
     }
 
     pub fn sort_by_unit_price(&mut self, sort: SortOrder) -> &mut Self {
-        self.param.sort.unit_price = Some(sort);
+        self.param
+            .sort
+            .get_or_insert_with(Default::default)
+            .unit_price = Some(sort);
         self
     }
 
     pub fn sort_by_auction_no(&mut self, sort: SortOrder) -> &mut Self {
-        self.param.sort.auction_no = Some(sort);
+        self.param
+            .sort
+            .get_or_insert_with(Default::default)
+            .auction_no = Some(sort);
         self
     }
 
@@ -123,17 +132,23 @@ impl AuctionHandler {
     }
 
     pub fn query(&mut self, query: Query) -> &mut Self {
-        self.param.query = query;
+        self.param.query = Some(query);
         self
     }
 
     pub fn min_level(&mut self, min_level: u8) -> &mut Self {
-        self.param.query.min_level = Some(min_level);
+        self.param
+            .query
+            .get_or_insert_with(Default::default)
+            .min_level = Some(min_level);
         self
     }
 
     pub fn max_level(&mut self, max_level: u8) -> &mut Self {
-        self.param.query.max_level = Some(max_level);
+        self.param
+            .query
+            .get_or_insert_with(Default::default)
+            .max_level = Some(max_level);
         self
     }
 
@@ -142,17 +157,23 @@ impl AuctionHandler {
     }
 
     pub fn rarity(&mut self, rarity: ItemRarity) -> &mut Self {
-        self.param.query.rarity = Some(rarity);
+        self.param.query.get_or_insert_with(Default::default).rarity = Some(rarity);
         self
     }
 
     pub fn min_reinforce(&mut self, min_reinforce: u8) -> &mut Self {
-        self.param.query.min_reinforce = Some(min_reinforce);
+        self.param
+            .query
+            .get_or_insert_with(Default::default)
+            .min_reinforce = Some(min_reinforce);
         self
     }
 
     pub fn max_reinforce(&mut self, max_reinforce: u8) -> &mut Self {
-        self.param.query.max_reinforce = Some(max_reinforce);
+        self.param
+            .query
+            .get_or_insert_with(Default::default)
+            .max_reinforce = Some(max_reinforce);
         self
     }
 
@@ -161,12 +182,18 @@ impl AuctionHandler {
     }
 
     pub fn min_refine(&mut self, min_refine: u8) -> &mut Self {
-        self.param.query.min_refine = Some(min_refine);
+        self.param
+            .query
+            .get_or_insert_with(Default::default)
+            .min_refine = Some(min_refine);
         self
     }
 
     pub fn max_refine(&mut self, max_refine: u8) -> &mut Self {
-        self.param.query.max_refine = Some(max_refine);
+        self.param
+            .query
+            .get_or_insert_with(Default::default)
+            .max_refine = Some(max_refine);
         self
     }
 
@@ -175,12 +202,18 @@ impl AuctionHandler {
     }
 
     pub fn min_adventure_fame(&mut self, min_adventure_fame: u16) -> &mut Self {
-        self.param.query.min_adventure_fame = Some(min_adventure_fame);
+        self.param
+            .query
+            .get_or_insert_with(Default::default)
+            .min_adventure_fame = Some(min_adventure_fame);
         self
     }
 
     pub fn max_adventure_fame(&mut self, max_adventure_fame: u16) -> &mut Self {
-        self.param.query.max_adventure_fame = Some(max_adventure_fame);
+        self.param
+            .query
+            .get_or_insert_with(Default::default)
+            .max_adventure_fame = Some(max_adventure_fame);
         self
     }
 
@@ -201,11 +234,11 @@ pub struct AuctionSearchParameter {
     #[serde(skip)]
     pub item_id: String,
     pub limit: Option<u16>,
-    pub sort: Sort,
+    pub sort: Option<Sort>,
     pub word_type: Option<WordType>,
     pub word_short: Option<bool>,
     #[serde(rename = "q")]
-    pub query: Query,
+    pub query: Option<Query>,
 }
 
 impl AuctionSearchParameter {
