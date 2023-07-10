@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DefaultOnNull};
+use time::PrimitiveDateTime;
 
 use super::{
     item::{Item, ItemExt, ItemRarity, ItemWithRarity},
@@ -392,10 +393,18 @@ pub enum SkillCostType {
 
 // ------------------------------------
 
+time::serde::format_description!(
+    timeline_date_format,
+    PrimitiveDateTime,
+    "[year]-[month]-[day] [hour]:[minute]"
+);
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TimelineDate {
-    pub end: String,
-    pub start: String,
+    #[serde(with = "timeline_date_format")]
+    pub start: PrimitiveDateTime,
+    #[serde(with = "timeline_date_format")]
+    pub end: PrimitiveDateTime,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -115,23 +115,20 @@ mod character {
     #[tokio::test]
     async fn timeline() {
         let client = client();
-        let mut characters = client
-            .character()
-            .name("PostScript")
-            .server(df_rs::model::Server::Casillas)
-            .search()
-            .await
-            .unwrap();
-        let character = characters.pop().unwrap();
+        let characters = get_characters().await.unwrap();
+        // characters.iter().for_each(|character| {
+        //     println!(
+        //         "https://api.neople.co.kr/df/servers/{}/characters/{}/timeline",
+        //         character.server, character.id
+        //     );
+        // });
+        for character in &characters {
+            let result =
+                retry_if_limit_exceeded!(client.character().of(character).timeline(None).await);
 
-        let timeline = client
-            .character()
-            .of(&character)
-            .timeline(None)
-            .await
-            .unwrap();
-
-        println!("{:#?}", timeline);
+            println!("{:#?}", result);
+            assert!(result.is_ok());
+        }
     }
 
     #[tokio::test]
