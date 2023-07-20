@@ -7,7 +7,7 @@ use urlencoding::encode;
 
 use crate::{
     error::InvalidQueryParameter,
-    model::{ItemInfo, ItemRarity, SearchItem},
+    model::{item::raw, ItemInfo, ItemRarity, SearchItem},
     DfClient, Result,
 };
 
@@ -48,7 +48,7 @@ impl ItemHandler {
             )
             .await?;
 
-        Ok(unwrap_rows!(resp, SearchItem))
+        Ok(unwrap_rows!(resp, raw::SearchItem => _))
     }
 
     pub async fn info(&self) -> Result<ItemInfo> {

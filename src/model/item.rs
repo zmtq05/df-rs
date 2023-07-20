@@ -1,3 +1,5 @@
+pub(crate) mod raw;
+
 use std::{fmt::Display, str::FromStr};
 
 use serde::{Deserialize, Serialize};
@@ -44,15 +46,10 @@ pub struct ItemExt {
 #[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct SearchItem {
-    #[serde(rename = "itemId")]
     pub id: String,
-    #[serde(rename = "itemName")]
     pub name: String,
-    #[serde(rename = "itemRarity")]
     pub rarity: ItemRarity,
-    #[serde(flatten)]
     pub r#type: ItemType,
-    #[serde(rename = "itemAvailableLevel")]
     pub available_level: u8,
 }
 
@@ -109,20 +106,15 @@ impl Display for ItemRarity {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct ItemType {
-    #[serde(rename = "itemTypeId")]
     pub id: String,
-    #[serde(rename = "itemType")]
     pub name: String,
-    #[serde(flatten)]
     pub detail: ItemTypeDetail,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct ItemTypeDetail {
-    #[serde(rename = "itemTypeDetailId")]
     pub id: String,
-    #[serde(rename = "itemTypeDetail")]
     pub name: String,
 }
 
@@ -153,7 +145,7 @@ pub struct ItemInfo {
     #[serde(rename = "itemFlavorText")]
     pub flavor_text: String,
 
-    pub obtain_info: ObtainInfo,
+    pub obtain_info: Option<ObtainInfo>,
 
     #[serde(flatten)]
     pub set: Option<Set>,

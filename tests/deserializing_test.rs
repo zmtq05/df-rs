@@ -66,12 +66,12 @@ mod item {
         let result = retry_if_limit_exceeded!(
             client()
                 .item()
-                .id("785e56a0ed4e3efd573da1f56a45217d")
+                .id("695d35f2e456dd2936a28e824fad8bf2")
                 .info()
                 .await
         );
 
-        // println!("{:#?}", result);
+        println!("{:#?}", result);
         assert!(result.is_ok());
     }
 }

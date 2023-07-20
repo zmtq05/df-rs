@@ -181,8 +181,13 @@ impl<'de> Deserialize<'de> for Status {
 mod character;
 pub use character::*;
 
-mod item;
-pub use item::*;
+pub mod item;
+pub use item::{
+    DungeonObtainInfo, EtcObtainInfo, EtcObtainInfoRow, Explain, GrowInfo, GrowOption,
+    GrowOptionDefault, GrowTotal, Item, ItemExt, ItemInfo, ItemRarity, ItemType, ItemTypeDetail,
+    ItemWithRarity, ObtainInfo, ReinforceSkill, ReinforceSkillInfo, RuneInfo, SearchItem, Set,
+    ShopObtainInfo, TalismanInfo,
+};
 
 pub mod auction;
 pub use auction::{AuctionItem, AuctionSoldItem};
