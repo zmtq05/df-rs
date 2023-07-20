@@ -188,3 +188,67 @@ mod auction;
 pub use auction::*;
 
 mod serde_helper;
+
+/// Range: 0~110
+type ItemAvailableLevel = u8;
+/// Range: 0~20
+type Reinforce = u8;
+/// Range: 0~8
+type Refine = u8;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
+pub enum Amplification {
+    None,
+    Strength,
+    Intelligence,
+    Vitality,
+    Spirit,
+}
+
+impl Display for Amplification {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Amplification::None => write!(f, ""),
+            Amplification::Strength => write!(f, "차원의 힘"),
+            Amplification::Intelligence => write!(f, "차원의 지능"),
+            Amplification::Vitality => write!(f, "차원의 체력"),
+            Amplification::Spirit => write!(f, "차원의 정신력"),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for Amplification {
+    fn deserialize<D>(deserializer: D) -> Result<Amplification, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s: Option<&str> = Deserialize::deserialize(deserializer)?;
+        match s {
+            None => Ok(Amplification::None),
+            Some("차원의 힘") => Ok(Amplification::Strength),
+            Some("차원의 지능") => Ok(Amplification::Intelligence),
+            Some("차원의 체력") => Ok(Amplification::Vitality),
+            Some("차원의 정신력") => Ok(Amplification::Spirit),
+            Some(s) => Err(serde::de::Error::custom(format!(
+                "invalid amplification: {}",
+                s
+            ))),
+        }
+    }
+}
+
+impl Serialize for Amplification {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            Amplification::None => serializer.serialize_none(),
+            Amplification::Strength => serializer.serialize_str("차원의 힘"),
+            Amplification::Intelligence => serializer.serialize_str("차원의 지능"),
+            Amplification::Vitality => serializer.serialize_str("차원의 체력"),
+            Amplification::Spirit => serializer.serialize_str("차원의 정신력"),
+        }
+    }
+}

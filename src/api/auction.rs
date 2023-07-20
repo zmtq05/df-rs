@@ -6,7 +6,7 @@ use urlencoding::encode;
 
 use crate::{
     error::InvalidQueryParameter,
-    model::{AuctionInfo, ItemRarity, SoldAuctionInfo},
+    model::{raw, AuctionItem, AuctionSoldItem, ItemRarity},
     DfClient, Result,
 };
 
@@ -30,15 +30,15 @@ impl AuctionHandler {
 
 /// # Send Request
 impl AuctionHandler {
-    pub async fn search(&self) -> Result<Vec<AuctionInfo>> {
+    pub async fn search(&self) -> Result<Vec<AuctionItem>> {
         let url = self.make_url("/auction")?;
 
         let resp = self.client.get_with_query(&url, Some(&self.param)).await?;
 
-        Ok(unwrap_rows!(resp, AuctionInfo))
+        Ok(unwrap_rows!(resp, raw::AuctionItem => _))
     }
 
-    pub async fn sold(&self) -> Result<Vec<SoldAuctionInfo>> {
+    pub async fn sold(&self) -> Result<Vec<AuctionSoldItem>> {
         let url = self.make_url("/auction-sold")?;
 
         let resp = self
@@ -46,7 +46,7 @@ impl AuctionHandler {
             .get_with_query(&url, Some(&self.param.to_sold_param()))
             .await?;
 
-        Ok(unwrap_rows!(resp, SoldAuctionInfo))
+        Ok(unwrap_rows!(resp, raw::AuctionSoldItem => _))
     }
 
     fn make_url(&self, path: &str) -> Result<String> {

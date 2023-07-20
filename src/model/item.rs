@@ -3,7 +3,7 @@ use std::{fmt::Display, str::FromStr};
 use serde::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 
-use super::serde_helper;
+use super::{serde_helper, Amplification, ItemAvailableLevel, Refine, Reinforce};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "typescript", derive(specta::Type))]
@@ -30,19 +30,14 @@ pub struct ItemWithRarity {
 #[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct ItemExt {
-    #[serde(rename = "itemId")]
     pub id: String,
-    #[serde(rename = "itemName")]
     pub name: String,
-    #[serde(rename = "itemRarity")]
     pub rarity: ItemRarity,
-    #[serde(flatten)]
     pub r#type: ItemType,
-    pub refine: u8,
-    pub reinforce: u8,
-    pub amplification_name: Option<String>,
-    #[serde(rename = "itemAvailableLevel")]
-    pub available_level: u8,
+    pub refine: Refine,
+    pub reinforce: Reinforce,
+    pub amplification_name: Amplification,
+    pub available_level: ItemAvailableLevel,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

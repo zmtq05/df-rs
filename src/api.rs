@@ -10,6 +10,24 @@ macro_rules! unwrap_rows {
 
         $resp.json::<__Rows>().await.unwrap().rows
     }};
+    ($resp:ident, $ty:ty, map($map:expr)) => {{
+        #[derive(serde::Deserialize)]
+        struct __Rows {
+            rows: Vec<$ty>,
+        }
+
+        $resp
+            .json::<__Rows>()
+            .await
+            .unwrap()
+            .rows
+            .into_iter()
+            .map($map)
+            .collect()
+    }};
+    ($resp:ident, $ty:ty => _) => {
+        unwrap_rows!($resp, $ty, map(Into::into))
+    };
 }
 
 /// impl Serialize for nested query
