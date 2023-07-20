@@ -6,7 +6,7 @@ use urlencoding::encode;
 
 use crate::{
     error::InvalidQueryParameter,
-    model::{raw, AuctionItem, AuctionSoldItem, ItemRarity},
+    model::{auction::raw, AuctionItem, AuctionSoldItem, ItemRarity},
     DfClient, Result,
 };
 

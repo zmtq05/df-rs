@@ -1,4 +1,4 @@
-pub mod raw;
+pub(crate) mod raw;
 
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;

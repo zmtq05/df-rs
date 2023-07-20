@@ -184,8 +184,8 @@ pub use character::*;
 mod item;
 pub use item::*;
 
-mod auction;
-pub use auction::*;
+pub mod auction;
+pub use auction::{AuctionItem, AuctionSoldItem};
 
 mod serde_helper;
 
