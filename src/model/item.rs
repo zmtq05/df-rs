@@ -6,6 +6,7 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use super::serde_helper;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct Item {
     #[serde(rename = "itemId")]
     pub id: String,
@@ -14,6 +15,7 @@ pub struct Item {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct ItemWithRarity {
     #[serde(rename = "itemId")]
@@ -25,6 +27,7 @@ pub struct ItemWithRarity {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct ItemExt {
     #[serde(rename = "itemId")]
@@ -43,6 +46,7 @@ pub struct ItemExt {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct SearchItem {
     #[serde(rename = "itemId")]
@@ -60,6 +64,7 @@ pub struct SearchItem {
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, DeserializeFromStr, SerializeDisplay,
 )]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub enum ItemRarity {
     Common,
     Uncommon,
@@ -107,26 +112,29 @@ impl Display for ItemRarity {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct ItemType {
     #[serde(rename = "itemTypeId")]
     pub id: String,
-    #[serde(rename = "itemType", default)]
+    #[serde(rename = "itemType")]
     pub name: String,
     #[serde(flatten)]
     pub detail: ItemTypeDetail,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct ItemTypeDetail {
     #[serde(rename = "itemTypeDetailId")]
     pub id: String,
-    #[serde(rename = "itemTypeDetail", default)]
+    #[serde(rename = "itemTypeDetail")]
     pub name: String,
 }
 
 // ------------------------------------
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct ItemInfo {
     #[serde(rename = "itemId")]
@@ -174,6 +182,7 @@ pub struct ItemInfo {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct Explain {
     #[serde(rename = "itemExplain")]
     pub value: String,
@@ -184,6 +193,7 @@ pub struct Explain {
 // ------------------------------------ ObtainInfo START
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct ObtainInfo {
     pub dungeon: Option<Vec<DungeonObtainInfo>>,
@@ -195,6 +205,7 @@ pub struct ObtainInfo {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct DungeonObtainInfo {
     // dungeon type
     //
@@ -206,6 +217,7 @@ pub struct DungeonObtainInfo {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct ShopObtainInfo {
     // ex) 모험단 상점, NPC 린지 로섬, ...
     pub name: String,
@@ -215,12 +227,14 @@ pub struct ShopObtainInfo {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct EtcObtainInfo {
     pub name: String,
     pub rows: Vec<EtcObtainInfoRow>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct EtcObtainInfoRow {
     pub name: String,
     pub details: Option<Vec<String>>,
@@ -229,6 +243,7 @@ pub struct EtcObtainInfoRow {
 // ------------------------------------ ObtainInfo END
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct Set {
     #[serde(rename = "setItemId")]
     pub id: String,
@@ -239,6 +254,7 @@ pub struct Set {
 // ------------------------------------
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct ReinforceSkill {
     #[serde(flatten)]
     pub job: super::character::Job,
@@ -246,6 +262,7 @@ pub struct ReinforceSkill {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct ReinforceSkillInfo {
     #[serde(rename = "skillId")]
     pub id: String,
@@ -257,6 +274,7 @@ pub struct ReinforceSkillInfo {
 // ------------------------------------
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct GrowInfo {
     pub transfer: Option<bool>,
     pub total: GrowTotal,
@@ -264,6 +282,7 @@ pub struct GrowInfo {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct GrowTotal {
     pub damage: i32,
     pub buff: i32,
@@ -271,6 +290,7 @@ pub struct GrowTotal {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct GrowOption {
     pub level: u8,
@@ -284,12 +304,14 @@ pub struct GrowOption {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct GrowOptionDefault {
     pub damage: i32,
     pub buff: i32,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct TalismanInfo {
     pub skill_id: String,
@@ -299,6 +321,7 @@ pub struct TalismanInfo {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct RuneInfo {
     pub skill_id: String,

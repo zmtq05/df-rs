@@ -8,6 +8,7 @@ use super::{
 };
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct Character {
     #[serde(rename = "characterId")]
     pub id: String,
@@ -26,6 +27,7 @@ pub struct Character {
 
 #[serde_as]
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterInfo {
     #[serde(rename = "characterId")]
@@ -48,6 +50,7 @@ pub struct CharacterInfo {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct Guild {
     #[serde(rename = "guildId")]
     pub id: String,
@@ -56,6 +59,7 @@ pub struct Guild {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct Job {
     #[serde(rename = "jobId")]
     pub id: String,
@@ -64,6 +68,7 @@ pub struct Job {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct JobGrow {
     #[serde(rename = "jobGrowId")]
     pub id: String,
@@ -109,6 +114,7 @@ macro_rules! decl_ty_extends_CharacterInfo {
 
 decl_ty_extends_CharacterInfo! {
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typescript", derive(specta::Type))]
     #[serde(rename_all = "camelCase")]
     pub struct CharacterEquipments {
         #[serde(rename = "equipment")]
@@ -117,6 +123,7 @@ decl_ty_extends_CharacterInfo! {
 }
 decl_ty_extends_CharacterInfo! {
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typescript", derive(specta::Type))]
     #[serde(rename_all = "camelCase")]
     pub struct CharacterAvatars {
         #[serde(rename = "avatar")]
@@ -125,6 +132,7 @@ decl_ty_extends_CharacterInfo! {
 }
 decl_ty_extends_CharacterInfo! {
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typescript", derive(specta::Type))]
     #[serde(rename_all = "camelCase")]
     pub struct CharacterCreature {
         pub creature: Option<Creature>,
@@ -132,6 +140,7 @@ decl_ty_extends_CharacterInfo! {
 }
 decl_ty_extends_CharacterInfo! {
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typescript", derive(specta::Type))]
     #[serde(rename_all = "camelCase")]
     pub struct CharacterFlag {
         pub flag: Option<Flag>,
@@ -139,6 +148,7 @@ decl_ty_extends_CharacterInfo! {
 }
 decl_ty_extends_CharacterInfo! {
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typescript", derive(specta::Type))]
     #[serde(rename_all = "camelCase")]
     pub struct CharacterTalismans {
         #[serde_as(deserialize_as = "DefaultOnNull")]
@@ -147,6 +157,7 @@ decl_ty_extends_CharacterInfo! {
 }
 decl_ty_extends_CharacterInfo! {
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typescript", derive(specta::Type))]
     #[serde(rename_all = "camelCase")]
     pub struct CharacterTimeline {
         pub timeline: Option<Timeline>,
@@ -156,6 +167,7 @@ decl_ty_extends_CharacterInfo! {
 // ------------------------------------
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct Equipment {
     #[serde(flatten)]
@@ -182,6 +194,7 @@ pub struct Equipment {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct Enchant {
     pub explain: Option<String>,
@@ -190,11 +203,13 @@ pub struct Enchant {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct FusionInfo {
     pub options: Vec<FusionOption>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct FusionOption {
     #[serde(default)]
@@ -222,6 +237,7 @@ pub struct FusionOption {
 // ------------------------------------
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct Avatar {
     #[serde(flatten)]
@@ -237,6 +253,7 @@ pub struct Avatar {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct Emblem {
     pub slot_no: u8,
@@ -248,6 +265,7 @@ pub struct Emblem {
 // ------------------------------------
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct Creature {
     #[serde(flatten)]
@@ -259,6 +277,7 @@ pub struct Creature {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct CreatureClone {
     pub item_id: Option<String>,
@@ -266,6 +285,7 @@ pub struct CreatureClone {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct Artifact {
     pub slot_color: String,
@@ -277,6 +297,7 @@ pub struct Artifact {
 // ------------------------------------
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct Flag {
     #[serde(flatten)]
@@ -292,6 +313,7 @@ pub struct Flag {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct Gem {
     pub slot_no: u8,
@@ -302,6 +324,7 @@ pub struct Gem {
 // ------------------------------------
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct Rune {
     pub slot_no: u8,
@@ -310,6 +333,7 @@ pub struct Rune {
 }
 
 #[derive(Debug, Clone, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct Talisman {
     pub slot_no: u8,
@@ -364,17 +388,20 @@ impl<'de> Deserialize<'de> for Talisman {
 NOTE: just return SkillStyle
 */
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct SkillStyleOuter {
     pub style: SkillStyle,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct SkillStyle {
     pub active: Vec<Skill>,
     pub passive: Vec<Skill>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct Skill {
     pub id: String,
@@ -385,6 +412,7 @@ pub struct Skill {
 }
 
 #[derive(Debug, Clone, Copy, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "UPPERCASE")]
 pub enum SkillCostType {
     SP,
@@ -400,6 +428,7 @@ time::serde::format_description!(
 );
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct TimelineDate {
     #[serde(with = "timeline_date_format")]
     pub start: PrimitiveDateTime,
@@ -408,13 +437,15 @@ pub struct TimelineDate {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct TimelineRow {
-    pub code: i64,
+    pub code: u16,
     pub name: String,
     pub date: String,
     pub data: serde_json::Map<String, serde_json::Value>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct Timeline {
     pub date: TimelineDate,
     pub next: Option<String>,
@@ -428,14 +459,16 @@ pub mod buff {
 
     decl_ty_extends_CharacterInfo! {
         #[derive(Debug, Clone, Deserialize, Serialize)]
+        #[cfg_attr(feature = "typescript", derive(specta::Type))]
         #[serde(rename_all = "camelCase")]
         pub struct CharacterBuffEnhance {
-            #[serde(rename(deserialize = "skill"), deserialize_with = "serde_helper::flatten_buff_enhance")]
+            #[serde(deserialize_with = "serde_helper::flatten_buff_enhance", rename(deserialize = "skill", serialize = "skillInfo"))]
             pub buff: Option<BuffEnhance>,
         }
     }
 
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typescript", derive(specta::Type))]
     #[serde(rename_all = "camelCase")]
     pub struct BuffEnhance {
         #[serde(rename = "skillInfo")]
@@ -452,6 +485,7 @@ pub mod buff {
     }
 
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typescript", derive(specta::Type))]
     #[serde(rename_all = "camelCase")]
     pub struct SkillInfo {
         #[serde(rename = "skillId")]
@@ -461,6 +495,7 @@ pub mod buff {
     }
 
     #[derive(Debug, Clone, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typescript", derive(specta::Type))]
     pub struct SkillOption {
         // skill level
         pub level: u8,

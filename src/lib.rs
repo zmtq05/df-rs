@@ -108,3 +108,8 @@ async fn map_api_error(response: Response) -> Result<Response> {
     error!("Response error: {}", err);
     Err(err.into())
 }
+
+#[cfg(feature = "typescript")]
+pub fn export(path: &str) {
+    specta::export::ts(path).unwrap();
+}

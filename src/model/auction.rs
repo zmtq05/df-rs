@@ -12,6 +12,7 @@ time::serde::format_description!(
 );
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct AuctionInfo {
     #[serde(rename = "auctionNo")]
@@ -30,6 +31,7 @@ pub struct AuctionInfo {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "camelCase")]
 pub struct SoldAuctionInfo {
     #[serde(with = "auction_date_format")]

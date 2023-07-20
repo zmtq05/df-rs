@@ -3,6 +3,7 @@ use std::{collections::HashMap, fmt::Display};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 #[serde(rename_all = "lowercase")]
 pub enum Server {
     All,
@@ -33,6 +34,7 @@ impl Display for Server {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct Slot {
     #[serde(rename = "slotId")]
     pub id: String,
@@ -112,9 +114,11 @@ pub struct Slot {
 ///
 /// TODO
 #[derive(Default, Debug, Clone, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct Status(pub HashMap<String, StatusValue>);
 
 #[derive(Debug, Clone, Serialize)]
+#[cfg_attr(feature = "typescript", derive(specta::Type))]
 pub struct StatusValue {
     pub value: f64,
     pub suffix: Option<char>,
